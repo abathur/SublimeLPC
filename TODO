@@ -1,0 +1,52 @@
+OVERVIEW:
+The LPC.sublime-syntax file is currently a very early draft. I've put in a fair amount of work on matching/patterns, but I've been suffering from some serious decision fatigue when it comes to naming scopes (and to a lesser degree deciding how specific some scopes should be). Luckily, assistance in this area doesn't require much understanding of the syntax file format.
+
+Syntax scopes can be any string, really. They're traditionally dot-delimited, in theory from less to more specific. The primary challenge is that, for a scope to DO anything, you need a theme that makes use of some part of the scope string (probably the leftmost parts). So there's a bit of a tradeoff between giving things the right name, and giving them a name that will result in useful syntax highlighting. We can of course give things a "correct" name, and a name that is more likely to result in useful highlighting.
+
+A subset of this problem is that sometimes things don't really have a name. We'll just refer to this colon or that semicolon without naming it. What names would you give the comma, colon and semicolon used to delimit keys and values in a mapping literal, for example?
+
+NOTE: I edit this file while using the PlainTasks sublime-text package, which gives it some useful highlighting.
+
+TODO:
+  Matching:
+   ✔ fix function declaration / global variable assignment confusion @done (15-05-31 21:40)
+   ☐ recognize -> operator
+        ☐ call_other operator
+        ☐ struct member reference operator
+        ☐ possibly usable to give special highlight to object struct vars
+            the hitch is that without broader code intel tracking these vars, they'd only get special highlighting when the syntax was right (i.e., an object assignment wouldn't show you the object color), so any highlighting based on it would need to be scoped very specifically
+
+   ☐ match doxygen/doc* style comments (this may be as simple as including an extant syntax def inside our comment defs)
+
+   ☐ possible to identify regex strings and give them sensible highlighting?
+        could match args to the various regex funcs, but that wouldn't catch a saved regex string elsewhere, and it'd be fragile long-term if those functions get modified, or if a given MUD replaces them with a sefun; "best" possibility might be seeking a syntax update to allow regex strings to be explicitly defined; wouldn't help existing ones.
+  Naming:
+    ☐ properly naming punctuation
+        ☐ literal open/close: array, closure, mapping, struct
+        ☐ colon in key:value for mapping/struct
+        ☐ semicolon in mapping row
+        ☐ # and ' in simple closure syntax, ' in symbol syntax
+           (documentation often calls these 'lfun' closures, but I resist using this name here as this closure operator is also combined with operators, efuns, sefuns and flow control keywords)
+        ☐ variable expansion/unpack operator (...)
+        ☐ < in array indexing
+        ☐ -> call-other & struct reference operator
+        ☐ () run-time operator for function/struct lookup.
+        ☐ :: super/inheritance operator
+            (and does it have a separate name with slightly meta uses like efun:: and sefun::?)
+
+ Idiomatic environment-specific support:
+    ☐ common mudlib applies (though this begs the question of what version to support)
+    ☐ mudlib-specific applies
+    ☐ some way of supporting mud-specific sefuns?
+    ☐ some way of supporting mud-specific efun addons?
+    ☐ include predefined constants
+        ☐ ldmud's predefs, from 'predefined' doc
+        ☐ mud-specific predefs (i.e., mandatory mudlib includes)
+
+  Test cases:
+    ☐ LPC @ ldmud 3.5
+        ☐ compilable complete or at least robust syntax sample file demonstrating all major language features at a reasonable degree of complexity
+        ☐ convert the above into ST3 syntax "test" format
+            see bottom of http://www.sublimetext.com/docs/3/syntax.html
+
+

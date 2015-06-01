@@ -1,0 +1,885 @@
+%YAML 1.2
+---
+# http://www.sublimetext.com/docs/3/syntax.html
+name: LPC
+comment: |
+  https://github.com/abathur/SublimeLPC
+
+  Derived from C Improved
+file_extensions:
+  - c
+  - h
+first_line_match: ""
+scope: source.lpc
+variables:
+  bulk_global_scoping: ((private|protected|public|static)\s*(functions|variables)\s*)
+  identifier: \b([A-Za-z_]\w*+)\b
+  value_types: \s*\b(closure|float|int|mapping|mixed|object|string|struct\s+({{identifier}})|symbol|void)\b\s*(\*)?
+contexts:
+  main:
+    - include: inherit
+    - include: default_visibility
+    - include: function
+    - include: translation_unit
+  array-literal:
+    - match: '\({'
+      scope: punctuation.definition.array.literal.start.lpc
+      push:
+        - meta_scope: meta.array.literal.lpc
+        - match: '}\)'
+          scope: punctuation.definition.array.literal.end.lpc
+          pop: true
+        - include: statement
+  block:
+    - match: '(?=\{)'
+      push:
+        - match: '\}'
+          pop: true
+        - include: block-lookahead-end
+  block-lookahead-end:
+    - match: '\{'
+      push:
+        - meta_scope: meta.block.lpc
+        - match: '(?=\})'
+          pop: true
+        - include: statement
+        - include: block
+  call:
+    - match: |-
+        (?x)
+          \s*
+          (?= # don't consume to recognize support functions
+              (?: [A-Za-z_]\w*+ | ::[^:] )++
+              (?:\s|/\*.*?\*/)*+ \(
+          )
+
+      push:
+        - meta_scope: meta.function-call.lpc
+        - match: \)
+          pop: true
+        - include: lex
+        - include: support-function
+        - include: parens-lookahead-end
+  closure:
+    - include: closure-inline
+    - include: closure-lambda
+    - include: closure-simple
+  closure-inline:
+    - include: closure-inline-literal
+    - include: closure-inline-verbose
+  closure-inline-literal: #todo scope just the literal (::)
+    - match: (\(:)(?=.*:\))
+      captures:
+        1: punctuation.definition.closure.inline.literal.start.lpc
+      push:
+        - meta_scope: closure.inline.literal.lpc
+        - match: \$\d+
+          captures:
+            0: closure.inline.literal.parameter.lpc
+        - match: ':\)'
+          scope: punctuation.definition.closure.inline.literal.end.lpc
+          pop: true
+        # most statements are valid here, this probably needs honing.
+        - include: lex
+        - include: call
+        - include: support-function
+  closure-inline-verbose:
+    - match: \bfunction\b
+      scope: closure.inline.verbose.lpc
+      push:
+        - include: value-type
+        - include: parens
+        - include: lex
+        - match: '\s*:\s*(?=.*{)'
+          push:
+            - meta_scope: closure.inline.verbose.context.lpc
+            - include: lex
+            - match: '{'
+              pop: true
+        - include: block
+        - match: '};'
+          pop: true
+  closure-lambda-arguments:
+    - include: symbol
+    - match: (?=\s*\}\))
+      pop: true
+    - match: ','
+      push:
+        - include: closure-lambda-arguments
+  closure-lambda-function:
+    - include: statement
+    - match: ','
+      push:
+        - include: closure-lambda-function
+        - include: closure-lambda-arguments
+        - match: (?=\s*\}\))
+          pop: true
+    - match: (?=\s*\}\))
+      pop: true
+  closure-lambda:
+    - match: \s*\b(unbound_)?lambda\s*
+      scope: support.function.efun.lpc
+      push:
+        - match: \(\s*
+          push:
+            - meta_content_scope: closure-lambda
+            - match: '\(\{\s*' # start arguments
+              push:
+                - meta_content_scope: closure-lambda-arguments
+                - match: \s*\}\)
+                  pop: true
+                - include: closure-lambda-arguments
+            - match: '\s*,\s*'
+              push:
+                - match: '\(\{\s*' # start function
+                  push:
+                    - meta_content_scope: closure-lambda-function
+                    - match: \s*\}\)
+                      pop: true
+                    - include: closure-lambda-function
+                - match: (?=\s*\))
+                  pop: true
+            - match: (?=\s*\))
+              pop: true
+        - match: \s*\)
+          pop: true
+  closure-simple:
+    - match: '#'''
+      scope: closure-simple
+      push:
+        - match: '[\[(,=&|?\-][<.{\[<|&!>]*'
+          scope: closure-simple-operator
+          pop: true
+        - match: ({{identifier}})?(::)
+          captures:
+            2: function-call.inherited.lpc
+            3: keyword.operator.inherited.lpc
+        - include: support-function
+        - include: lex-keyword # TODO this can be vastly improved, but we'll need a list of valid
+        - match: '{{identifier}}'
+          scope: something.function.lfun.lpc
+        - match: \b
+          pop: true
+  comments:
+    - match: ^\s*/\* =(\s*.*?)\s*= \*/$\n?
+      scope: comment.block.lpc
+      captures:
+        1: meta.toc-list.banner.block.lpc
+    - match: \s*/\*
+      captures:
+        0: punctuation.definition.comment.lpc
+      push:
+        - meta_scope: comment.block.lpc
+        - match: \*/
+          pop: true
+    - match: '\*/(?=[^*].*\n)'
+      scope: invalid.illegal.stray-comment-end.lpc
+    - match: ^\s*// =(\s*.*?)\s*=\s*$\n?
+      scope: comment.line.banner.lpc
+      captures:
+        1: meta.toc-list.banner.line.lpc
+    - match: \s*//
+      captures:
+        0: punctuation.definition.comment.lpc
+      push:
+        - meta_scope: comment.line.double-slash.lpc
+        - match: '(?<=^|[^\\])\s*(?=\n)$\n?'
+          pop: true
+        - include: lex-continuation
+  default_visibility:
+    - match: ^(?=default\s+.*;)
+      push:
+        - meta_scope: keyword.other.default-scope.lpc
+        - match: default\s+
+          captures:
+            0: keyword.other.scope.default.lpc
+        - match: '{{bulk_global_scoping}}'
+          captures:
+            1: keyword.other.scope.default.lpc
+            2: keyword.other.scope.default.visibility.lpc keyword.other.visibility.scope.default.lpc
+            3: keyword.other.scope.default.type.lpc
+        - match: '{{bulk_global_scoping}}'
+          captures:
+            1: keyword.other.scope.default.lpc
+            2: keyword.other.scope.default.visibility.lpc keyword.other.visibility.scope.default.lpc
+            3: keyword.other.scope.default.type.lpc
+        - match: .?(?:;)
+          pop: true
+    - match: ;
+      pop: true
+  function:
+    - include: function-fixup-macro
+    - include: function-declaration
+    - include: function-definition
+  function-modifier:
+    - match: \s*\b(nomask|private|protected|public|static|varargs|(deprecated))\b
+      captures:
+        1: storage.modifier.function.lpc
+        2: invalid.deprecated.function.lpc
+  function-declaration:
+    - include: function-modifier
+    - include: value-type # should probably be a warning/invalid type if absent?
+    - match: |-
+        (?x)
+          (?<![=])
+          \s*
+          (   (?: [A-Za-z_]\w*+)++  )
+          (?= (?: \s* \(  (?> (?! [()] ). )* \) ) \s* ;)
+
+      captures:
+        1: entity.name.function.declaration.lpc
+      push:
+        - meta_scope: meta.function.lpc
+        - match: ;
+          pop: true
+        - include: lex
+        - include: parens
+        - include: value-type
+  function-definition:
+    - include: function-modifier
+    - include: value-type
+    # TODO I suspect this match can be honed further
+    - match: |-
+        (?x)
+          \s*
+          (   (?: [A-Za-z_]\w*+)++  ) # identifier
+          (?= (?: \s* \(  (?> (?! [()] ). )* \) ) \s* (?!;))
+
+      captures:
+        1: entity.name.function.definition.lpc
+      push:
+        - meta_scope: meta.function.lpc
+        - match: '\}|;'
+          pop: true
+        - include: lex
+        - include: parens
+        - include: block-lookahead-end
+  function-fixup-macro:
+    - match: |-
+        (?x)
+          ^ # Begin of line, capital letters: most probably it is a macro
+          \s*\b
+          ([A-Z0-9_]++)
+          \b
+          (?= (?:\s|/\*.*?\*/)*+ \( )
+      push:
+        - match: \)
+          pop: true
+        - include: lex
+        - include: parens-lookahead-end
+  inherit: #TODO this could be more graceful and less brute-force...?
+    - match: ^(?=.*\binherit\s+)(?=.*;)
+      push:
+        - meta_scope: keyword.other.inherit.statement.lpc #better scope?
+        - match: '{{bulk_global_scoping}}'
+          captures:
+            1: keyword.other.scope.inherit.lpc
+            2: keyword.other.scope.inherit.visibility.lpc keyword.other.visibility.scope.inherit.lpc
+            3: keyword.other.scope.inherit.type.lpc
+        - match: '{{bulk_global_scoping}}'
+          captures:
+            1: keyword.other.scope.inherit.lpc
+            2: keyword.other.scope.inherit.visibility.lpc keyword.other.visibility.scope.inherit.lpc
+            3: keyword.other.scope.inherit.type.lpc
+        - match: \bvirtual\s+
+          captures:
+            0: keyword.other.inherit.virtual.lpc
+        - match: \binherit\s+
+          captures:
+            0: keyword.other.inherit.lpc
+        - match: '"(.*)"(?:;)'
+          captures:
+            1: entity.other.inherit.lpc
+          pop: true
+        - match: ({{identifier}})(?:;)
+          captures:
+            1: entity.other.inherit.lpc
+          pop: true
+  lex:
+    - include: lex-in-preprocessor
+    - include: preprocessor
+  lex-continuation:
+    - match: (\\)$\n?
+      scope: punctuation.separator.continuation.lpc
+      captures:
+        1: keyword.other.line-continuation.lpc
+    - match: \\(\s+?)(?=\n)$
+      captures:
+        1: invalid.deprecated.space-after-continuation.lpc
+  lex-core:
+    - include: comments
+    - include: lex-continuation
+    - include: lex-number
+    - include: lex-string
+  lex-in-preprocessor:
+    - include: lex-core
+    - include: lex-keyword
+  lex-keyword:
+    - match: \s*\b(break|case|continue|do|else|for(each)?|if|return|switch|while)\b
+      captures:
+        1: keyword.control.lpc
+    - include: value-type
+    - match: \s*\b(nosave|private|public|static|(deprecated))\b
+      captures:
+        1: storage.modifier.variable.lpc
+        2: invalid.deprecated.variable.lpc
+    - match: (\-|\+|\*|\/|%|&|\||\^|<<|>>)?=
+      scope: keyword.operator.assignment.lpc
+    - match: (==|!=|<=|>=|<>|<|>)
+      scope: keyword.operator.comparison.lpc
+    - match: (\-\-|\+\+)
+      scope: keyword.operator.increment-decrement.lpc
+    - match: (\?|:)
+      scope: keyword.operator.ternary.lpc
+    - match: (\-|\+|\*|\/|%)
+      scope: keyword.operator.arithmetic.lpc
+    - match: (!|&&|\|\|)
+      scope: keyword.operator.logical.lpc
+    - match: (~|&|\||\^|<<|>>)
+      scope: keyword.operator.bitwise.lpc
+    - match: '(\.|->)(?=(?:\s|/\*.*?\*/)*+[A-Za-z_]\w*+)'
+      scope: keyword.operator.dereference.lpc
+  lex-number:
+    - match: '\s*(\b(0[xX][0-9a-fA-F]*|0[0-7]*|[1-9][0-9]*)\b)'
+      captures:
+        1: constant.numeric.integer.lpc
+    - match: '\s*(\b(([0-9]+\.[0-9]*)|(\.[0-9]+))([eE][+\-]?[0-9]+)?\b)'
+      captures:
+        1: constant.numeric.float.lpc
+    - match: '\s*(\b(?i:(0b[01]+))\b)'
+      captures:
+        1: constant.numeric.integer.binary.lpc
+    - match: '\s*(\b(?i:(0o[0-7]+))\b)'
+      captures:
+        1: constant.numeric.integer.octal.lpc
+  lex-string:
+    - match: '"'
+      captures:
+        0: punctuation.definition.string.begin.lpc
+      push:
+        - meta_scope: string.quoted.double.lpc
+        - match: '(")|(?<=^|[^\\])\s*(\n)'
+          captures:
+            1: punctuation.definition.string.end.lpc
+            2: invalid.illegal.unexpected-end-of-line.lpc
+          pop: true
+        - include: lex-continuation
+        - include: string_escaped_char
+        - include: string_placeholder
+    #TODO: I bet this still needs much work; a robust test case would be nice.
+    - match: |-
+          (?x)
+            '(?=
+              (\\
+                (
+                  [abefnrt]     |
+                  0[xob][dunno] |
+                  .
+                )
+              ) |
+              .
+            ')
+
+            #"(?<!#)'"
+      captures:
+        0: punctuation.definition.string.begin.lpc
+      push:
+        - meta_scope: string.quoted.single.lpc
+        - match: '('')|(?<=^|[^\\])\s*(\n)'
+          captures:
+            1: punctuation.definition.string.end.lpc
+            2: invalid.illegal.unexpected-end-of-line.lpc
+          pop: true
+        - include: lex-continuation
+        - include: string_escaped_char
+  mapping-literal:
+    - match: '\(\['
+      scope: punctuation.definition.mapping.literal.start.lpc
+      push:
+        - meta_content_scope: mapping-literal-row
+        - include: mapping-literal-row
+        - match: ']\)'
+          scope: punctuation.definition.mapping.literal.end.lpc
+          pop: true
+  mapping-literal-key:
+    - match: ':'
+      scope: mapping-key-value-separator
+      set:
+        - meta_content_scope: mapping-literal-value
+        - include: mapping-literal-value
+    - match: ','
+      scope: mapping-row-separator
+      pop: true
+    - include: statement
+  mapping-literal-value:
+    - match: ;
+      scope: mapping-value-value-separator
+      set:
+        - meta_content_scope: mapping-literal-value
+        - include: mapping-literal-value
+    - match: ','
+      scope: mapping-row-separator
+      set:
+        - meta_content_scope: mapping-literal-row
+        - include: mapping-literal-row
+    - match: '\s*(?=]\))'
+      pop: true
+    - include: statement
+  mapping-literal-row:
+    - match: (?<=.)
+      set:
+        - meta_content_scope: mapping-literal-key
+        - include: mapping-literal-key
+    - match: '\s*(?=]\))'
+      pop: true
+  parens:
+    - match: (?=\()
+      push:
+        - match: \)
+          pop: true
+        - include: parens-lookahead-end
+  parens-lookahead-end:
+    - match: \(
+      push:
+        - meta_scope: meta.parens.lpc
+        - match: (?=\))
+          pop: true
+        - include: statement
+        - include: block
+        - include: parens
+  ppline-any:
+    - match: ^\s*(#)
+      captures:
+        0: keyword.other.preprocessor.lpc
+      push:
+        - meta_scope: meta.preprocessor.directive.null-directive.lpc
+        - match: '(?<=^|[^\\])\s*(?=\n)$\n?'
+          pop: true
+        - include: lex-core
+  ppline-directive:
+    - match: ^\s*(#)\s*(if|ifdef|ifndef|elif|else|endif|pragma|line|define|undef|error|warning)\b
+      captures:
+        0: keyword.other.preprocessor.lpc
+      push:
+        - meta_scope: meta.preprocessor.directive.lpc
+        - match: '(?<=^|[^\\])\s*(?=\n)$\n?'
+          pop: true
+        - include: lex-core
+  ppline-directive-invalid-usage:
+    - match: (^\s*(#)\s*(if|ifdef|ifndef|elif|pragma|define|undef|include)\b)\s*?(\n|$)
+      scope: meta.preprocessor.directive.lpc
+      captures:
+        1: keyword.other.preprocessor.lpc
+        4: invalid.illegal.invalid-usage-of-preprocessor-directive.lpc
+  ppline-include:
+    - match: ^\s*(#)\s*(include|include_next|import)\b
+      captures:
+        0: keyword.other.preprocessor.include.lpc
+      push:
+        - meta_scope: meta.preprocessor.include.lpc meta.preprocessor.lpc.include
+        - match: '(?:("[^"]*?)|(<[^>]*?))(\n)|(?<=^|[^\\])\s*(?=\n)$\n?'
+          captures:
+            1: string.quoted.double.include.lpc
+            2: string.quoted.other.lt-gt.include.lpc
+            3: invalid.illegal.unexpected-end-of-line.lpc
+          pop: true
+        - include: ppline-include-innards
+  ppline-include-innards:
+    - include: preprocessor-lex
+    - match: '"|(?=.*?")'
+      captures:
+        0: punctuation.definition.string.begin.lpc
+      push:
+        - meta_scope: string.quoted.double.include.lpc
+        - match: '"|(?<=^|[^\\])(?=\s*\n)'
+          captures:
+            0: punctuation.definition.string.end.lpc
+          pop: true
+    - match: <(?=.*?>)
+      captures:
+        0: punctuation.definition.string.begin.lpc
+      push:
+        - meta_scope: string.quoted.other.lt-gt.include.lpc
+        - match: '>|(?<=^|[^\\])(?=\s*\n)'
+          captures:
+            0: punctuation.definition.string.end.lpc
+          pop: true
+    - match: \(
+      push:
+        - meta_scope: meta.parens.lpc
+        - match: '\)|(?<=^|[^\\])(?=\s*\n)'
+          pop: true
+        - include: ppline-include-innards
+  ppline-invalid:
+    - match: '^\s*(#)(?!\s*(?=/[/*]|(?>\\\s*\n)|\n|$))'
+      push:
+        - meta_scope: meta.preprocessor.directive.lpc invalid.illegal.preprocessor.lpc
+        - match: '(?<=^|[^\\])\s*(?=\n)$\n?'
+          pop: true
+  ppline-macro:
+    - match: '^\s*(#)(?=\s*(define)\s+[a-zA-Z_]\w*+)'
+      captures:
+        0: keyword.other.preprocessor.lpc
+      push:
+        - meta_scope: meta.preprocessor.macro.lpc
+        - match: |-
+            (?x)
+              (?: (?<=^|[^\\])\s*(?=\n)$\n?
+                | (?<= [^\\]\n ) | (?<= \A\n ) )  # unexpected end of line
+          pop: true
+        - match: \s*(##)
+          captures:
+            1: keyword.other.preprocessor.lpc
+        - match: '\s*(#)\s*([a-zA-Z_]\w*+)'
+          captures:
+            1: keyword.other.preprocessor.lpc
+            2: string.macro.stringify.lpc
+        - include: ppline-macro-head-function
+        - include: ppline-macro-head-object
+        - include: lex-in-preprocessor
+  ppline-macro-head-function:
+    - match: '(?<!##)(?<=#)(\s*define)\s+([a-zA-Z_]\w*+)(\()'
+      captures:
+        1: keyword.other.preprocessor.define.lpc
+        2: entity.name.function.preprocessor.lpc
+        3: meta.preprocessor.macro.parameters.lpc
+      push:
+        - meta_content_scope: meta.preprocessor.macro.parameters.lpc
+        - match: '(?<=\))|(?<=^|[^\\])\s*(\n)'
+          captures:
+            1: invalid.illegal.unexpected-end-of-line.lpc
+          pop: true
+        - match: \)
+        - match: '{{identifier}}'
+          captures:
+            1: variable.parameter.lpc
+          push:
+            - match: '(?<=\))|(?=(?<=^|[^\\])\s*(\n))'
+              pop: true
+            - match: \)
+            - include: ppline-macro-param-next
+            - include: ppline-macro-param-vararg
+            - include: ppline-macro-param-lex
+            - include: ppline-macro-param-lex-invalid
+        - include: ppline-macro-param-vararg
+        - include: ppline-macro-param-lex
+        - include: ppline-macro-param-lex-invalid
+  ppline-macro-head-object:
+    - match: '(?<!##)(?<=#)(\s*define)\s+([a-zA-Z_]\w*+)(?!\()[\s&&[^\n]]*'
+      captures:
+        1: keyword.other.preprocessor.define.lpc
+        2: entity.name.constant.preprocessor.lpc
+  ppline-macro-param-lex:
+    - match: \s*
+    - match: \s*//
+      captures:
+        0: punctuation.definition.comment.lpc
+      push:
+        - meta_scope: invalid.illegal.unexpected-end-of-line.lpc
+        - match: '(?<=^|[^\\])\s*(?=\n)$'
+          pop: true
+        - include: lex-continuation
+    - include: preprocessor-lex
+  ppline-macro-param-lex-invalid:
+    - match: |-
+        (?x)
+          (?: (?! (?:\s|/\*.*?\*/)*+
+                  (?: \) | (?>(?:\\\s*)?$\n?) | /[/*] ) )
+              .) # no star unlike its friends in arg/vararg
+      scope: invalid.illegal.unexpected-character.lpc
+  ppline-macro-param-next:
+    - match: (,)
+      captures:
+        1: punctuation.separator.parameter.lpc
+      push:
+        - match: '{{identifier}}|(?=\.\.\.)|(\))|(?=(?<=^|[^\\])\s*(\n))'
+          captures:
+            1: variable.parameter.lpc
+            2: invalid.illegal.unexpected-closing-paren.lpc
+          pop: true
+        - include: ppline-macro-param-lex
+        - match: |-
+            (?x)
+              (?: (?! (?:\s|/\*.*?\*/)*+
+                    (?: {{identifier}} | \.\.\. | \) | (?>(?:\\\s*)?$\n?) | /[/*] ) )
+                  .)*
+          scope: invalid.illegal.unexpected-character.lpc
+  ppline-macro-param-vararg:
+    - match: (\.\.\.)
+      captures:
+        1: punctuation.definition.ellipsis.lpc
+      push:
+        - match: '(\))|(?=(?<=^|[^\\])\s*(\n))'
+          pop: true
+        - include: ppline-macro-param-lex
+        - match: |-
+            (?x)
+              (?: (?! (?:\s|/\*.*?\*/)*+
+                    (?: \) | (?>(?:\\\s*)?$\n?) | /[/*] ) )
+                  .)*
+          scope: invalid.illegal.unexpected-character.lpc
+  ppline-pragma-mark:
+    - match: '(^\s*(#)\s*(pragma\s+mark)\b)[\s&&[^\n]]*'
+      captures:
+        1: keyword.other.preprocessor.pragma.lpc
+      push:
+        - meta_scope: meta.preprocessor.directive.pragma-mark.lpc
+        - meta_content_scope: meta.toc-list.pragma-mark.lpc
+        - match: '(?<=^|[^\\])\s*(?=\n)$\n?'
+          pop: true
+        - include: preprocessor-lex
+        - match: .
+          scope: string.other.pragma-mark.lpc
+  ppline-undef:
+    - match: '(^\s*(#)\s*(undef))\s+([a-zA-Z_]\w*+)'
+      captures:
+        1: keyword.other.preprocessor.lpc
+        4: variable.macro.undef.lpc
+      push:
+        - meta_scope: meta.preprocessor.undef.lpc
+        - match: '(?<=^|[^\\])\s*(?=\n)$\n?'
+          pop: true
+  preprocessor:
+    - match: (?=^\s*(#))
+      push:
+        - match: (?!^\s*(#))
+          pop: true
+        - include: preprocessor-disabled
+        - include: ppline-directive-invalid-usage
+        - include: ppline-macro
+        - include: ppline-undef
+        - include: ppline-pragma-mark
+        - include: ppline-include
+        - include: ppline-directive
+        - include: ppline-invalid
+        - include: ppline-any
+  preprocessor-disabled:
+    - match: '^\s*(#)(?=\s*(if)\s+(0[xX])?0++\b)'
+      captures:
+        0: meta.preprocessor.directive.lpc keyword.other.preprocessor.lpc
+      push:
+        - match: (?=^\s*(#)\s*(endif|else|elif))
+          pop: true
+        - include: preprocessor-disabled-conditional
+        - match: ^\s*(#)
+          push:
+            - meta_scope: comment.other.preprocessor-disabled.lpc
+            - match: '(?<=^|[^\\])\s*(?=\n)$\n?'
+              pop: true
+        - match: '(?<!##)(?<=#)(\s*if)\s+(?=(0[xX])?0++\b)'
+          captures:
+            1: keyword.other.preprocessor.define.lpc
+          push:
+            - meta_scope: meta.preprocessor.directive.lpc
+            - match: '(?<=^|[^\\])\s*(?=\n)$\n?'
+              pop: true
+            - include: lex-core
+        - match: .
+          scope: comment.other.preprocessor-disabled.lpc
+  preprocessor-disabled-conditional:
+    - match: ^\s*(#)\s*if(n?def)?\b
+      push:
+        - meta_scope: comment.other.preprocessor-disabled.lpc
+        - match: ^\s*(#)\s*endif\b.*$
+          pop: true
+        - include: preprocessor-disabled-conditional
+        - match: ^\s*(#)
+          push:
+            - meta_scope: comment.other.preprocessor-disabled.lpc
+            - match: '(?<=^|[^\\])\s*(?=\n)$\n?'
+              pop: true
+  preprocessor-lex:
+    - include: comments
+    - include: lex-continuation
+  statement:
+    - include: closure
+    - include: array-literal
+    - include: mapping-literal
+    - include: struct-literal
+    - include: symbol
+    - include: lex
+    - include: call
+    - include: parens
+  string_escaped_char:
+    - match: '\\(\\|[abefnprtv''"?]|[0-3]\d{,2}|[4-7]\d?|x[a-fA-F0-9]{,2}|u[a-fA-F0-9]{,4}|U[a-fA-F0-9]{,8})'
+      scope: constant.character.escape.lpc
+    - match: \\.
+      scope: invalid.illegal.unknown-escape.lpc
+  string_placeholder:
+    - match: '%(?!%)'
+      captures:
+        0: constant.other.placeholder.lpc
+      push:
+        - match: |-
+            (?x)
+              (                           # 1
+                ('(.+)')                   | # pad str, 2-3
+                ([#\- +=|$@]*)             | # flags, 4
+                ((-?\d+|\*)?([:.])?(-?\d+|\*))| # 5-7
+              )
+
+          captures:
+            2: constant.other.placeholder.pad.lpc
+            3: constant.other.placeholder.pad.string.lpc
+            4: constant.other.placeholder.modifier.lpc
+            5: constant.other.placeholder.field.lpc
+            6: constant.other.placeholder.field.width.lpc
+            7: constant.other.placeholder.field.separator.lpc
+            8: constant.other.placeholder.field.precision.lpc
+        - match: '[sdfOQioxXeEgGc]'
+          scope: constant.other.placeholder.type.lpc
+          pop: true
+  struct-literal:
+    - match: '\(\<'
+      scope: punctuation.definition.struct.literal.start.lpc
+      push:
+        - match: '{{identifier}}'
+          scope: entity.name.struct.lpc
+        - match: '>'
+          push:
+            - meta_content_scope: struct-literal-row
+            - include: struct-literal-row
+        - match: '\)'
+          scope: punctuation.definition.struct.literal.end.lpc
+          pop: true
+  struct-literal-row:
+    - match: (?<=.)
+      set:
+        - meta_content_scope: struct-literal-key
+        - include: struct-literal-key
+    - match: '(?=\s*[)])'
+      pop: true
+  struct-literal-key:
+    - match: '(:)\s*|(?=[^:]*[,)])'
+      captures:
+        1: struct-key-value-separator # i.e., the colon
+      set:
+        - meta_content_scope: struct-literal-value
+        - include: struct-literal-value
+    - match: ',\s*'
+      pop: true
+  struct-literal-value:
+    - match: ',\s*'
+      set:
+        - meta_content_scope: struct-literal-row
+        - include: struct-literal-row
+    - include: statement
+    - match: '(?=\s*[)])'
+      pop: true
+  support:
+    - include: support-function
+  support-function:
+    - match: \s*\b(abs|acos|add_action|add_verb|add_xverb|all_environment|all_inventory|allocate|allocate_mapping|and_bits|apply|asin|assoc|atan|atan2|attach_erq_demon|baseof|binary_message|bind_lambda|blueprint|break_point|call_direct|call_direct_resolved|call_other|call_out|call_out_info|call_resolved|caller_stack|caller_stack_depth|capitalize|cat|catch|ceil|clear_bit|clone_object|clonep|clones|closurep|command|command_stack|command_stack_depth|configure_driver|configure_interactive|convert_charset|copy|copy_bits|copy_file|copy_mapping|cos|count_bits|creator|crypt|ctime|db_affected_rows|db_close|db_coldefs|db_connect|db_conv_string|db_error|db_exec|db_fetch|db_handles|db_insert_id|debug_info|debug_message|deep_copy|deep_inventory|destruct|disable_commands|ed|efun308|enable_commands|enable_telnet|end_mccp_compress|environment|exec|execute_command|exp|expand_define|explode|export_uid|extern_call|extract|file_name|file_size|filter|filter_array|filter_indices|filter_mapping|filter_objects|find_call_out|find_input_to|find_object|first_inventory|floatp|floor|funcall|function_exists|functionlist|garbage_collection|get_combine_charset|get_connection_charset|get_dir|get_error_file|get_eval_cost|get_extra_wizinfo|get_max_commands|get_type_info|geteuid|getuid|gmtime|hash|heart_beat_info|hmac|idna_stringprep|idna_to_ascii|idna_to_unicode|implode|include_list|inherit_list|input_to|input_to_info|insert_alist|interactive|intersect_alist|intp|invert_bits|json_parse|json_serialize|last_bit|last_instructions|limited|living|load_name|load_object|localtime|log|lower_case|m_add|m_allocate|m_contains|m_delete|m_entry|m_indices|m_reallocate|m_sizeof|m_values|make_shared_string|map|map_array|map_indices|map_mapping|map_objects|mapping_contains|mappingp|master|match_command|max|md5|md5_crypt|member|member_array|min|mkdir|mkmapping|mktime|move_object|negate|net_connect|next_bit|next_inventory|notify_fail|object_info|object_name|object_time|objectp|or_bits|order_alist|parse_command|pg_close|pg_connect|pg_conv_string|pg_pending|pg_query|pointerp|pow|present|present_clone|previous_object|printf|process_string|program_name|program_time|query_actions|query_command|query_editing|query_idle|query_imp_port|query_input_pending|query_ip_name|query_ip_number|query_limits|query_load_average|query_mccp|query_mccp_stats|query_mud_port|query_notify_fail|query_once_interactive|query_shadowing|query_snoop|query_udp_port|query_verb|quote|raise_error|random|read_bytes|read_file|referencep|regexp|regexp_package|regexplode|regmatch|regreplace|remove_action|remove_call_out|remove_input_to|remove_interactive|rename|rename_object|replace_program|restore_object|restore_value|reverse|rm|rmdir|rmember|rusage|save_object|save_value|say|send_erq|send_imp|send_udp|set_auto_include_string|set_bit|set_buffer_size|set_combine_charset|set_connection_charset|set_driver_hook|set_environment|set_extra_wizinfo|set_extra_wizinfo_size|set_heart_beat|set_is_wizard|set_light|set_limits|set_max_commands|set_modify_command|set_next_reset|set_prompt|set_this_object|set_this_player|seteuid|sgn|sha1|shadow|shutdown|sin|sizeof|sl_close|sl_exec|sl_insert_id|sl_open|slice_array|snoop|sort_array|sprintf|sqrt|sscanf|start_mccp_compress|strftime|stringp|strlen|strrstr|strstr|struct_info|structp|swap|symbol_function|symbol_variable|symbolp|tail|tan|tell_object|tell_room|terminal_colour|test_bit|this_interactive|this_object|this_player|throw|time|tls_available|tls_check_certificate|tls_deinit_connection|tls_error|tls_init_connection|tls_query_connection_info|tls_query_connection_state|tls_refresh_certs|to_array|to_float|to_int|to_object|to_string|to_struct|trace|traceprefix|transfer|transpose_array|trim|typeof|unique_array|unmkmapping|unquote|unshadow|upper_case|users|utime|variable_exists|variable_list|walk_mapping|widthof|wizlist_info|write|write_bytes|write_file|xml_generate|xml_parse|xor_bits)\b
+      captures:
+        1: support.function.efun.lpc
+  translation_unit:
+    - include: struct
+    - include: statement
+    - include: block
+  struct:
+    - include: struct-declaration
+    - include: struct-definition
+  struct-declaration:
+    - match: |-
+        (?x)
+          (?<= \A struct | \W struct ) \b
+          (?= (?:\s*+)
+              ([A-Za-z_]\w*+)
+              (?:\s*+);
+          )
+
+      push:
+        - meta_scope: meta.compound.lpc
+        - match: (?<=;) # terminate the declaration when we hit the semicolon
+          pop: true
+        - include: lex
+        - match: '\s*{{identifier}}'
+          captures:
+            1: entity.name.struct.declaration.lpc
+  struct-definition:
+    - match: |-
+        (?x)
+                (?<= \A struct | \W struct ) \b
+
+                # Negation of zero-length parts of the end pattern
+                # to prevent entering the rule if it's gonna exit immediately.
+                # (workaround ST2 bugs, see issue #10)
+                (?=\s*(?:[A-Za-z_({]|/[/*]|$))
+                (?! \s*\b(?: [A-Za-z_]\w*+ ) (?= \s* [\[;] ) )
+      push:
+        - meta_scope: meta.compound.lpc
+        - match: |-
+            (?x)
+                    (?: (?!\s*(?:[A-Za-z_({]|/[/*]|$))
+                      | (?= \s*\b(?: [A-Za-z_]\w*+ ) (?= \s* [\[;] ) )
+                    )
+
+          pop: true # abandon ship
+        - match: |-
+            (?x)
+              {{identifier}}
+              (\s*\(\s*([A-Za-z_]\w*+)\s*\))?
+
+          captures:
+            1: entity.name.struct.lpc
+            3: entity.name.struct.parent.lpc
+        - include: lex
+        - include: block
+        - include: parens
+  symbol:
+    - match: "(')({{identifier}})"
+      captures:
+        0: symbol-entity
+        1: symbol-punctuation
+        2: symbol-identifier
+  value-type: # straight types, array types, and union types
+    - include: value-type-union
+    - include: value-type-single
+  value-type-single:
+    - match: "{{value_types}}"
+      captures:
+        1: storage.type.lpc
+        2: entity.name.struct.lpc
+        4: storage.type.array.lpc # should this be thought of as an operator?
+  value-type-union: #todo this roughly works but needs better handling of a mix of regular and bracketed unions.
+    # int * | float * blah means blah can be an array of ints OR an array of floats.
+    # <int|float>* blah means blah can be an array that holds int or float.
+    - match: <(?={{value_types}}\s*\|)
+      scope: punctuation.union.array.start.lpc
+      push:
+        - meta_content_scope: beep1.storage.type.union.lpc
+        - match: '(>)\s*(\*)?(\s*\|)?'
+          captures:
+            1: punctuation.union.array.end.lpc
+            2: storage.type.array.lpc
+            3: type_union_operator
+          pop: true
+        - include: value-type-single
+    - match: '(?={{value_types}}\s*\|)'
+      push:
+        - meta_content_scope: beep2.storage.type.union.lpc
+        - match: '\|'
+          scope: type_union_operator
+        - include: value-type-single
+        - match: '(?=\s*{{identifier}})'
+          scope: flerp
+          pop: true
+
+# Currently unused, TODO
+  variable:
+    #- include: variable-declaration
+    - include: variable-definition
+    # - include: variable-assignment
+  variable-definition:
+    - match: ^(?!=.*;)
+      pop: true
+    - include: value-type
+    - match: '\s*{{identifier}}'
+      scope: variable.global.lpc
+    - match: \s*=\s*
+      push:
+        - include: lex
+        - include: call
+        - include: closure-simple
+    - match: ;
+      pop: true
