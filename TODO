@@ -3,50 +3,125 @@ The LPC.sublime-syntax file is currently a very early draft. I've put in a fair 
 
 Syntax scopes can be any string, really. They're traditionally dot-delimited, in theory from less to more specific. The primary challenge is that, for a scope to DO anything, you need a theme that makes use of some part of the scope string (probably the leftmost parts). So there's a bit of a tradeoff between giving things the right name, and giving them a name that will result in useful syntax highlighting. We can of course give things a "correct" name, and a name that is more likely to result in useful highlighting.
 
+http://www.apeth.com/nonblog/stories/textmatebundle.html has a list of commonly-themed scopes, but I haven't done my own survey to see how accurate it is.
+
 A subset of this problem is that sometimes things don't really have a name. We'll just refer to this colon or that semicolon without naming it. What names would you give the comma, colon and semicolon used to delimit keys and values in a mapping literal, for example?
 
-NOTE: I edit this file while using the PlainTasks sublime-text package, which gives it some useful highlighting.
+NOTES:
+- I edit this file while using the PlainTasks sublime-text package, which isn't essential for reading this, but does make it easier on the eyes. I use the following user settings for PlainTasks
+---- ✄ -----------------------
+{
+    "color_scheme": "Packages/PlainTasks/tasks-eighties-colored.hidden-tmTheme",
+    "font_face": "Inconsolata-g",
+    "font_size": 11.3,
+      "tab_size": 4,
+}
+---- ✄ -----------------------
+- I am currently only focused on supporting ldmud 3.5.x language features. I suspect this will still cover those of us using 3.3.x pretty well (in fact, our MUD is still running on 3.3.719, so I'll be living daily with any differences myself). I realize, however, that it's possible people running older versions of the driver, or other members of the LP family tree, may want special support. We'll cross this bridge if it comes up; open an issue.
 
 TODO:
-  Matching:
-   ✔ fix function declaration / global variable assignment confusion @done (15-05-31 21:40)
-   ☐ recognize -> operator
-        ☐ call_other operator
-        ☐ struct member reference operator
-        ☐ possibly usable to give special highlight to object struct vars
-            the hitch is that without broader code intel tracking these vars, they'd only get special highlighting when the syntax was right (i.e., an object assignment wouldn't show you the object color), so any highlighting based on it would need to be scoped very specifically
+Philosophical:
+Need to answer some philosophical questions probably.
+    ☐ Does this provide decent support for highlighting what will compile, or is it *opinionated*, with an eye towards best practices and some ignorance of bad ones?
 
-   ☐ match doxygen/doc* style comments (this may be as simple as including an extant syntax def inside our comment defs)
+    ☐ Does this aim to provide comprehensive/detailed scopes, or does it aim for minimalism and just highlight the most distinct/useful language features?
 
-   ☐ possible to identify regex strings and give them sensible highlighting?
-        could match args to the various regex funcs, but that wouldn't catch a saved regex string elsewhere, and it'd be fragile long-term if those functions get modified, or if a given MUD replaces them with a sefun; "best" possibility might be seeking a syntax update to allow regex strings to be explicitly defined; wouldn't help existing ones.
-  Naming:
+    ☐ Does this match deprecated efuns?
+    ☐ Does this support older LD/LP versions? LPC as employed on other LP-family drivers?
+
+General:
+    ☐ Is there any meaningful value we can give first-line-match?
+      I can't imagine we're all going to go insert a line into thousands of files; I don't think we have anything that can be reliably matched, ourselves.
+
+    ☐ make sure all unnecessary C support is actually gone
+      I've done some a fair amount of slash-and-burn, but oftentimes it isn't as simple as pruning a wholly unused feature, but more about modifying an existing match to remove parts that are irrelevant to us.
+
+    ✔ convert all .c scopes to .lpc @note that this means there may now be C cruft hiding under .lpc scopes. @done (15-05-31 22:54)
+    ✔ fix accidental lpc++ scopes :) @done (15-05-31 23:07)
+    ☐ Identify common units of re-use that can be collapsed into named variables or into named contexts
+    ✔ alpha-sort contexts @done (15-05-31 23:43)
+    ☐ replace placeholder contexts with something vaguely descriptive if not reasonable
+    ☐ remove all incidental profanity :)
+    ☐ do a better job of documenting regex while you still remember what it's for...
+
+Matching & language features:
+    ✔ fix function declaration / global variable assignment confusion @done (15-05-31 21:40)
+    ☐ Operators
+      Generally operators are highlighted well enough at the moment, but a lot of this is just due to the underlying C improved support, which I haven't fiddled too thoroughly with. In part this is pending a good decision on how detailed to get.
+        ☐ recognize -> operator
+            ☐ call_other operator
+            ☐ struct member reference operator
+            ☐ possibly usable to give special highlight to object struct vars
+              the hitch is that without broader code intel tracking these vars, they'd only get special highlighting when the syntax was right (i.e., an object assignment wouldn't show you the object color), so any highlighting based on it would need to be scoped very specifically
+        ...
+
+    ☐ match doxygen/doc* style comments (this may be as simple as including an extant syntax def inside our comment defs)
+
+    ☐ possible to identify regex strings and give them sensible highlighting?
+      could match args to the various regex funcs, but that wouldn't catch a saved regex string elsewhere, and it'd be fragile long-term if those functions get modified, or if a given MUD replaces them with a sefun; "best" possibility might be seeking a syntax update to allow regex strings to be explicitly defined; wouldn't help existing ones.
+
+    Provide basic matching support for major LPC features:
+    I.e., while these are matched, there are inevitably issues. This is mostly just documenting where I've built beyond or significantly modified what C Improved already supported.
+        ✔ Closures: 'simple', 'inline (literal and verbose)', 'lambda' @done (15-05-31 23:04)
+        ✔ Default visibility modifiers @done (15-05-31 23:08)
+        ✔ functions @done (15-05-31 23:09)
+            ✔ declarations @done (15-05-31 23:09)
+            ✔ definitions @done (15-05-31 23:09)
+            ✔ efuns @done (15-05-31 23:09)
+            ✔ modifiers @done (15-05-31 23:09)
+            ✔ types @done (15-05-31 23:09)
+        ✔ inherit @done (15-05-31 23:11)
+            ✔ default visibility modifiers @done (15-05-31 23:11)
+            ✔ virtual @done (15-05-31 23:11)
+        ✔ keywords: break, case, continue, do, else, for(each), if, return, switch, while @done (15-05-31 23:17)
+        ☐ literals
+            ✔ arrays @done (15-05-31 23:17)
+            ☐ character (i.e., single-quoted string)
+              This still needs some work, but I did get a scaffold in place; could probably use good test cases.
+            ✔ mappings @done (15-05-31 23:17)
+            ✔ numbers (int, float, 0x, 0b, 0o) @done (15-05-31 23:17)
+            ✔ string (double quoted) @done (15-05-31 23:21)
+                ✔ LPC sprintf format @done (15-05-31 23:22)
+            ✔ structs @done (15-05-31 23:17)
+            ✔ symbols @done (15-05-31 23:25)
+        ☐ type unions
+            ✔ basic support @done (15-05-31 23:27)
+            ☐ mixing bracketed and regular unions
+        ☐ variables
+          Not sure advanced support's really necessary here
+            ✔ types @done (15-05-31 23:28)
+            ☐ definitions
+            ☐ declarations
+
+Naming:
+    ☐ review and settle broader scope/naming standards
     ☐ properly naming punctuation
         ☐ literal open/close: array, closure, mapping, struct
         ☐ colon in key:value for mapping/struct
         ☐ semicolon in mapping row
         ☐ # and ' in simple closure syntax, ' in symbol syntax
-           (documentation often calls these 'lfun' closures, but I resist using this name here as this closure operator is also combined with operators, efuns, sefuns and flow control keywords)
+          (documentation often calls these 'lfun' closures, but I resist using this name here as this closure operator is also combined with operators, efuns, sefuns and flow control keywords)
         ☐ variable expansion/unpack operator (...)
         ☐ < in array indexing
         ☐ -> call-other & struct reference operator
         ☐ () run-time operator for function/struct lookup.
         ☐ :: super/inheritance operator
-            (and does it have a separate name with slightly meta uses like efun:: and sefun::?)
+          (and does it have a separate name with slightly meta uses like efun:: and sefun::?)
+        ...
 
- Idiomatic environment-specific support:
+Test cases:
+    For now, 3.5 support is the goal. In the mid term, it may be reasonable to look at (either via completely separate files, preprocessor blocks based on driver version, or git branches) making sure this will actually compile into a real object
+    ☐ LPC @ ldmud 3.5
+        ☐ compilable & complete or at least robust syntax sample file demonstrating all major language features at a reasonable degree of complexity
+        ☐ convert the above into ST3 syntax "test" format
+          see bottom of http://www.sublimetext.com/docs/3/syntax.html
+
+Idiomatic environment-specific support:
+    While core LPC highlighting is certainly a big step up from what most of us have been dealing with, we'd all probably also benefit from figuring out how to match some more environment-specific items. This probably looks like file (either in Python or LPC) which takes a templated version of LPC.sublime-syntax and fills it in with MUD-specific details.
     ☐ common mudlib applies (though this begs the question of what version to support)
     ☐ mudlib-specific applies
     ☐ some way of supporting mud-specific sefuns?
     ☐ some way of supporting mud-specific efun addons?
     ☐ include predefined constants
-        ☐ ldmud's predefs, from 'predefined' doc
+        ☐ ldmud's predefs, from /doc/driver/predefined
         ☐ mud-specific predefs (i.e., mandatory mudlib includes)
-
-  Test cases:
-    ☐ LPC @ ldmud 3.5
-        ☐ compilable complete or at least robust syntax sample file demonstrating all major language features at a reasonable degree of complexity
-        ☐ convert the above into ST3 syntax "test" format
-            see bottom of http://www.sublimetext.com/docs/3/syntax.html
-
-
