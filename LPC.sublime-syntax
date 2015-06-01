@@ -122,10 +122,10 @@ contexts:
       push:
         - match: \(\s*
           push:
-            - meta_content_scope: closure-lambda
+            - meta_content_scope: closure.lambda
             - match: '\(\{\s*' # start arguments
               push:
-                - meta_content_scope: closure-lambda-arguments
+                - meta_content_scope: closure.lambda.arguments
                 - match: \s*\}\)
                   pop: true
                 - include: closure-lambda-arguments
@@ -133,7 +133,7 @@ contexts:
               push:
                 - match: '\(\{\s*' # start function
                   push:
-                    - meta_content_scope: closure-lambda-function
+                    - meta_content_scope: closure.lambda.function
                     - match: \s*\}\)
                       pop: true
                     - include: closure-lambda-function
@@ -145,19 +145,19 @@ contexts:
           pop: true
   closure-simple:
     - match: '#'''
-      scope: closure-simple
+      scope: closure.simple
       push:
         - match: '[\[(,=&|?\-][<.{\[<|&!>]*'
-          scope: closure-simple-operator
+          scope: closure.simple.operator
           pop: true
         - match: ({{identifier}})?(::)
           captures:
-            2: function-call.inherited.lpc
+            2: meta.function-call.super.lpc
             3: keyword.operator.inherited.lpc
         - include: support-function
         - include: lex-keyword # TODO this can be vastly improved, but we'll need a list of valid
         - match: '{{identifier}}'
-          scope: something.function.lfun.lpc
+          scope: closure.simple.lfun
         - match: \b
           pop: true
   comments:
@@ -396,31 +396,31 @@ contexts:
     - match: '\(\['
       scope: punctuation.definition.mapping.literal.start.lpc
       push:
-        - meta_content_scope: mapping-literal-row
+        - meta_content_scope: mapping.literal.row
         - include: mapping-literal-row
         - match: ']\)'
           scope: punctuation.definition.mapping.literal.end.lpc
           pop: true
   mapping-literal-key:
     - match: ':'
-      scope: mapping-key-value-separator
+      scope: mapping.key-value-separator
       set:
-        - meta_content_scope: mapping-literal-value
+        - meta_content_scope: mapping.literal.value
         - include: mapping-literal-value
     - match: ','
-      scope: mapping-row-separator
+      scope: mapping.row-separator
       pop: true
     - include: statement
   mapping-literal-value:
     - match: ;
-      scope: mapping-value-value-separator
+      scope: mapping.value-value-separator
       set:
-        - meta_content_scope: mapping-literal-value
+        - meta_content_scope: mapping.literal.value
         - include: mapping-literal-value
     - match: ','
-      scope: mapping-row-separator
+      scope: mapping.row-separator
       set:
-        - meta_content_scope: mapping-literal-row
+        - meta_content_scope: mapping.literal.row
         - include: mapping-literal-row
     - match: '\s*(?=]\))'
       pop: true
@@ -428,7 +428,7 @@ contexts:
   mapping-literal-row:
     - match: (?<=.)
       set:
-        - meta_content_scope: mapping-literal-key
+        - meta_content_scope: mapping.literal.key
         - include: mapping-literal-key
     - match: '\s*(?=]\))'
       pop: true
@@ -847,7 +847,7 @@ contexts:
     - match: <(?={{value_types}}\s*\|)
       scope: punctuation.union.array.start.lpc
       push:
-        - meta_content_scope: beep1.storage.type.union.lpc
+        - meta_content_scope: storage.type.union.lpc
         - match: '(>)\s*(\*)?(\s*\|)?'
           captures:
             1: punctuation.union.array.end.lpc
@@ -857,12 +857,11 @@ contexts:
         - include: value-type-single
     - match: '(?={{value_types}}\s*\|)'
       push:
-        - meta_content_scope: beep2.storage.type.union.lpc
+        - meta_content_scope: storage.type.union.lpc
         - match: '\|'
           scope: type_union_operator
         - include: value-type-single
         - match: '(?=\s*{{identifier}})'
-          scope: flerp
           pop: true
 
 # Currently unused, TODO
