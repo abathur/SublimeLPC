@@ -1,3 +1,4 @@
+// SYNTAX TEST "Packages/C/C.sublime-syntax"
 /* struct def */
 struct StructBlue;
 struct StructOne

@@ -1,3 +1,4 @@
+// SYNTAX TEST "Packages/C/C.sublime-syntax"
 /* Won't update directly; relies on structs only present when included in lpc.c */
 //SECTION 1: OBJECT-GLOBAL VARIABLES
 //basic declarations

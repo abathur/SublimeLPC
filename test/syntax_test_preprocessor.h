@@ -1,3 +1,4 @@
+// SYNTAX TEST "Packages/C/C.sublime-syntax"
 #if 0
 Test out the preprocessor
 #elif 0

@@ -1,3 +1,4 @@
+// SYNTAX TEST "Packages/C/C.sublime-syntax"
 //demonstrate flow-control keywords and some related concepts
 
 void flow()

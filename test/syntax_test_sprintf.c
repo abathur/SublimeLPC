@@ -1,3 +1,4 @@
+// SYNTAX TEST "Packages/C/C.sublime-syntax"
 void reset(int arg)
 {
 	sprintf("decimal=%d, octal=%o, hexadecimal=%x\n", 7, 7, 7);

@@ -1,3 +1,4 @@
+// SYNTAX TEST "Packages/C/C.sublime-syntax"
 public int operators()
 {
 	int operators_a = 10;
