@@ -11,7 +11,7 @@ void flow()
 				break;
 			case 1:
 				break;
-			case 2:
+			case 2..22:
 				//fall through
 			default:
 				return;

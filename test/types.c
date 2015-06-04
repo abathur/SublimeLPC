@@ -116,6 +116,8 @@ mixed * func_array_types_e()
 struct StructBlue post_structuralism(int one, struct StructOne two, string three)
 {
 	return two->one_h;
+	return two->("one_h");
+	return two->(three);
 }
 
 /* union types */

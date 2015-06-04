@@ -31,6 +31,28 @@ void reset(int arg)
 //modifiers, declarations, definitions, literals, and assignments are also all tested here; implicitly tests efuns if they aren't tested better elsewhere; closures partially tested via literals, but I think closures.c should handle a more robust test set since they can get very complex.
 #include "types.c"
 
+//play with indexing
+void indexing()
+{
+	//arrays
+	types_literal_array_c[0];
+	int one = 1;
+	types_literal_array_c[one];
+	types_literal_array_c[one]++;
+	types_literal_array_c[0..];
+	types_literal_array_c[>0..];
+	types_literal_array_c[>0];
+	types_literal_array_c[<1..];
+	types_literal_array_c[<1];
+	types_literal_array_c[0..<2];
+	types_literal_array_c[..<1];
+
+	//mappings
+	types_literal_f["one"];
+	types_literal_f["one", 1];
+	types_literal_f[1, 2];
+}
+
 /*
 ✔ Closures: 'simple', 'inline (literal and verbose)', 'lambda' @done (15-05-31 23:04)
 ✔ functions @done (15-05-31 23:09)
