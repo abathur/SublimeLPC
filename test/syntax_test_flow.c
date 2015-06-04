@@ -1,4 +1,4 @@
-// SYNTAX TEST "Packages/C/C.sublime-syntax"
+// SYNTAX TEST "Packages/User/LPC/LPC.sublime-syntax"
 //demonstrate flow-control keywords and some related concepts
 
 void flow()

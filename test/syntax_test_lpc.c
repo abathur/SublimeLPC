@@ -2,8 +2,7 @@
 // syntax highlighting test for LPC
 #include <strings.h>
 #define ST_BASE __DIR__ + "syntax_test_"
-// <- meta.preprocessor.lpc.include
-// ^ keyword.other.preprocessor.include.lpc
+
 #include ST_BASE + "preprocessor.h"
 
 /* This test file (and others in this directory) should demonstrate all major features of LPC as well as some common syntactical edge cases for the purpose of testing the robustness of the syntax highlighter. This file should successfully compile (at least on 3.5.x)... */

@@ -1,4 +1,4 @@
-// SYNTAX TEST "Packages/C/C.sublime-syntax"
+// SYNTAX TEST "Packages/User/LPC/LPC.sublime-syntax"
 public int operators()
 {
 	int operators_a = 10;
@@ -39,3 +39,5 @@ public int operators()
 	// test6h = (<NahStruct> nah: 1, bro: "ok");
 	implode(({({"one", "two"}), "three"})...); //TODO: flatten operator
 }
+// <- meta.preprocessor.lpc.include
+// ^ keyword.other.preprocessor.include.lpc
