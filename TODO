@@ -3,7 +3,7 @@ The LPC.sublime-syntax file is currently a very early draft. I've put in a fair 
 
 Syntax scopes can be any string, really. They're traditionally dot-delimited, in theory from less to more specific. The primary challenge is that, for a scope to DO anything, you need a theme that makes use of some part of the scope string (probably the leftmost parts). So there's a bit of a tradeoff between giving things the right name, and giving them a name that will result in useful syntax highlighting. We can of course give things a "correct" name, and a name that is more likely to result in useful highlighting.
 
-http://www.apeth.com/nonblog/stories/textmatebundle.html has a list of commonly-themed scopes, but I haven't done my own survey to see how accurate it is.
+http://www.apeth.com/nonblog/stories/textmatebundle.html has a list of commonly-themed scopes, but I haven't done my own survey of themes to see how accurate it is.
 
 A subset of this problem is that sometimes things don't really have a name. We'll just refer to this colon or that semicolon without naming it. What names would you give the comma, colon and semicolon used to delimit keys and values in a mapping literal, for example?
 
@@ -20,7 +20,7 @@ NOTES:
 - I am currently only focused on supporting ldmud 3.5.x language features. I suspect this will still cover those of us using 3.3.x pretty well (in fact, our MUD is still running on 3.3.719, so I'll be living daily with any differences myself). I realize, however, that it's possible people running older versions of the driver, or other members of the LP family tree, may want special support. We'll cross this bridge if it comes up; open an issue.
 
 TODO:
-Philosophical:
+Open questions:
 Need to answer some philosophical questions probably.
     ☐ Does this provide decent support for highlighting what will compile, or is it *opinionated*, with an eye towards best practices and some ignorance of bad ones?
 
@@ -29,10 +29,10 @@ Need to answer some philosophical questions probably.
     ☐ Does this match deprecated efuns?
     ☐ Does this support older LD/LP versions? LPC as employed on other LP-family drivers?
 
-General:
     ☐ Is there any meaningful value we can give first-line-match?
       I can't imagine we're all going to go insert a line into thousands of files; I don't think we have anything that can be reliably matched, ourselves.
 
+General:
     ☐ make sure all unnecessary C support is actually gone
       I've done some a fair amount of slash-and-burn, but oftentimes it isn't as simple as pruning a wholly unused feature, but more about modifying an existing match to remove parts that are irrelevant to us.
 
@@ -40,8 +40,8 @@ General:
     ✔ fix accidental lpc++ scopes :) @done (15-05-31 23:07)
     ☐ Identify common units of re-use that can be collapsed into named variables or into named contexts
     ✔ alpha-sort contexts @done (15-05-31 23:43)
-    ☐ replace placeholder contexts with something vaguely descriptive if not reasonable
-    ☐ remove all incidental profanity :)
+    ✔ replace placeholder contexts with something vaguely descriptive if not reasonable @done (15-06-04 14:33)
+    ✔ remove all incidental profanity :) @done (15-06-04 14:33)
     ☐ do a better job of documenting regex while you still remember what it's for...
 
 Matching & language features:
