@@ -34,10 +34,8 @@ public int operators()
 	operators_d = ([1:2;3, "one":"two";operators_a]);
 	operators_d[1, 1] = operators_d["one", 1];
 
-	// test5e = operators_f->query_name(operators_d);
-	// test5e = (struct NahStruct) operators_h->name;
-	// test6h = (<NahStruct> nah: 1, bro: "ok");
-	implode(({({"one", "two"}), "three"})...); //TODO: flatten operator
+	implode(({({"one", "two"}), "three"})...);
+
 }
 // <- meta.preprocessor.lpc.include
 // ^ keyword.other.preprocessor.include.lpc

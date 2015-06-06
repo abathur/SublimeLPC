@@ -1,5 +1,6 @@
 // SYNTAX TEST "Packages/User/LPC/LPC.sublime-syntax"
 /* Won't update directly; relies on structs only present when included in lpc.c */
+#define CRASH_WARNING 1 //see use below; don't change this value
 //SECTION 1: OBJECT-GLOBAL VARIABLES
 //basic declarations
 closure types_a;
@@ -29,6 +30,7 @@ int types_literal_b = 113333;
 string types_literal_c = "super calloused"+ "fragile mystic";
 symbol types_literal_d = 'types_literal_b;
 
+
 //simple array literals
 float * types_literal_array_a = ({1.113, 3.111});
 int * types_literal_array_b = ({1113, 3111});
@@ -36,11 +38,16 @@ string * types_literal_array_c = ({"one", "two", "three"});
 mixed * types_literal_array_d = ({"one", 1, 1.0});
 object * types_literal_array_e = ({this_object(), this_object()});
 
+
 //complex literals
-closure types_literal_e1 = (:"I hope so" + implode(types_literal_array_c, types_literal_c) + $1:);
+//closure types_literal_e1 = (:"I hope so" + implode(types_literal_array_c, types_literal_c) + $1:);
 closure types_literal_e2 = #'this_player;
 closure types_literal_e3 = lambda( ({ 'x }), ({ #'environment, 'x }) );
+#if CRASH_WARNING
+//WARNING: If enabled, the following else block will (in conjunction with some other lines in this file) cause a segfault and hard crash the next time this object is destructed. It's being preprocessor-guarded so we can test syntax highlighting on it without running it.
+#else
 closure types_literal_e4 = function int (int val) : int x = 2 * types_literal_b { return val * x; };
+#endif
 mapping types_literal_f = ([1:2;3, "one":"two";"three"]);
 
 //TODO: something goes awry in the struct
@@ -55,13 +62,16 @@ struct StructOne types_literal_g1 = (<StructOne>
 	one_i: 'wow_much_symbolism,
 );
 struct StructBlue types_literal_g2 = (<StructBlue> 1, "ok");
-
 /* union types */
 #if LDMUD_VERSION >= VERSION(3, 5, 0)
 
-closure|float|int|mapping|mixed|object|string|struct StructBlue|symbol|void union_a;
-<closure|float|int|mapping|mixed|object|string|struct StructBlue|symbol|void>* union_b;
-closure *|float*|int *|mapping *|mixed *|object *|string *|struct StructBlue *|symbol *|void * union_c;
+closure|float union_aa;
+closure|float|int|mapping|mixed|object union_ab;
+closure|float|int|mapping|mixed|object|string union_ac;
+
+closure|float|int|mapping|mixed|object|string|struct StructBlue|symbol union_a;
+<closure|float|int|mapping|mixed|object|string|struct StructBlue|symbol>* union_b;
+closure *|float*|int *|mapping *|mixed *|object *|string *|struct StructBlue *|symbol * union_c;
 <closure|float>*|struct StructBlue * union_d; //not positive this is valid
 #endif
 
@@ -123,9 +133,9 @@ struct StructBlue post_structuralism(int one, struct StructOne two, string three
 
 /* union types */
 #if LDMUD_VERSION >= VERSION(3, 5, 0)
-private varargs <int|float>*|struct StructBlue * lets_get_meta_structural(int|float arg1a, int*|float* arg1b, <int|float>* arg1c, struct StructOne two, varargs string * extra);
+private varargs <int|float>*|struct StructOne * lets_get_meta_structural(int|float arg1a, int*|float* arg1b, <int|float>* arg1c, struct StructOne * two, varargs string * extra);
 
-private varargs <int|float>*|struct StructBlue * lets_get_meta_structural(int|float arg1a, int*|float* arg1b, <int|float>* arg1c, struct StructOne * two, varargs string * extra)
+private varargs <int|float>*|struct StructOne * lets_get_meta_structural(int|float arg1a, int*|float* arg1b, <int|float>* arg1c, struct StructOne * two, varargs string * extra)
 {
 	if(random(2))
 	{
@@ -135,6 +145,17 @@ private varargs <int|float>*|struct StructBlue * lets_get_meta_structural(int|fl
 	{
 		return two;
 	}
+}
+#endif
+
+/* test deprecated modifier */
+#if LDMUD_VERSION >= VERSION(3, 3, 720)
+//not 100% sure the driver will let us use this as a variable name
+deprecated int danger = 1; //TODO: should only match modifiers before type(s)? modifiers after type as error? something...
+deprecated int dont_call_me_bro();
+deprecated int dont_call_me_bro()
+{
+	danger = 2; //should be a deprecation warning
 }
 #endif
 
@@ -180,7 +201,11 @@ void types()
 	closure local_types_literal_e1 = (:"I hope so" + implode(local_types_literal_array_c, local_types_literal_c) + $1:);
 	closure local_types_literal_e2 = #'this_player;
 	closure local_types_literal_e3 = lambda( ({ 'x }), ({ #'environment, 'x }) );
+#if CRASH_WARNING
+//WARNING: If enabled, the following else block will (in conjunction with some other lines in this file) cause a segfault and hard crash the next time this object is destructed. It's being preprocessor-guarded so we can test syntax highlighting on it without running it.
+#else
 	closure local_types_literal_e4 = function int (int val) : int x = 2 * local_types_literal_b { return val * x; };
+#endif
 	mapping local_types_literal_f = ([1:2;3, "one":"two";"three"]);
 
 	//TODO: something goes awry in the struct
@@ -198,14 +223,15 @@ void types()
 
 /* union types */
 #if LDMUD_VERSION >= VERSION(3, 5, 0)
-	closure|float|int|mapping|mixed|object|string|struct StructBlue|symbol|void local_union_a;
-	<closure|float|int|mapping|mixed|object|string|struct StructBlue|symbol|void>* local_union_b;
-	closure *|float*|int *|mapping *|mixed *|object *|string *|struct StructBlue *|symbol *|void * local_union_c;
+	closure|float|int|mapping|mixed|object|string|struct StructBlue|symbol local_union_a;
+	<closure|float|int|mapping|mixed|object|string|struct StructBlue|symbol>* local_union_b;
+	closure *|float*|int *|mapping *|mixed *|object *|string *|struct StructBlue *|symbol *local_union_c;
 	<closure|float>*|struct StructBlue * local_union_d; //not positive this is valid
 #endif
 
 	//assignments (this is mostly just a repeat of the above sans type)
 	//a few globals
+
 	types_literal_a = 11.33333;
 	types_literal_b = to_int(types_literal_a);
 	types_literal_c += "vexed with halitosis";
@@ -232,7 +258,13 @@ void types()
 	local_types_literal_e1 = (:"I hope so" + implode(local_types_literal_array_c, local_types_literal_c) + $1:);
 	local_types_literal_e2 = #'this_player;
 	local_types_literal_e3 = lambda( ({ 'x }), ({ #'environment, 'x }) );
+
+
+#if CRASH_WARNING
+//WARNING: If enabled, the following else block will (in conjunction with some other lines in this file) cause a segfault and hard crash the next time this object is destructed. It's being preprocessor-guarded so we can test syntax highlighting on it without running it.
+#else
 	local_types_literal_e4 = function int (int val) : int x = 2 * local_types_literal_b { return val * x; };
+#endif
 	local_types_literal_f = ([1:2;3, "one":"two";"three"]);
 
 	//TODO: something goes awry in the struct
@@ -251,14 +283,3 @@ void types()
 	dont_call_me_bro(); //should be a deprecation warning
 #endif
 }
-
-/* test deprecated modifier */
-#if LDMUD_VERSION >= VERSION(3, 3, 720)
-//not 100% sure the driver will let us use this as a variable name
-deprecated int deprecated = 1; //TODO: should only match modifiers before type(s)
-deprecated int dont_call_me_bro();
-deprecated int dont_call_me_bro()
-{
-	deprecated = 2; //should be a deprecation warning
-}
-#endif

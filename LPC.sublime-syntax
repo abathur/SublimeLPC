@@ -13,7 +13,7 @@ first_line_match: ""
 scope: source.lpc
 variables:
   bulk_global_scoping: ((private|protected|public|static)\s*(functions|variables)\s*)
-  identifier: \b([A-Za-z_]\w*+)\b
+  identifier: \b([A-Za-z_$][A-Za-z_$0-9]*+)\b
   value_types: \s*\b(closure|float|int|mapping|mixed|object|string|struct\s+({{identifier}})|symbol|void)\b\s*(\*)?
 contexts:
   main:
@@ -67,25 +67,26 @@ contexts:
   closure-inline:
     - include: closure-inline-literal
     - include: closure-inline-verbose
-  closure-inline-literal: #todo scope just the literal (::)
-    - match: (\(:)(?=.*:\))
+  closure-inline-literal-argument:
+    - match: \$\d+
+      scope: closure.inline.literal.parameter.lpc
+  closure-inline-literal: #todo scope just the literal (::)?
+    - match: (\(:)
       captures:
         1: punctuation.definition.closure.inline.literal.start.lpc
       push:
         - meta_scope: closure.inline.literal.lpc
-        - match: \$\d+
-          captures:
-            0: closure.inline.literal.parameter.lpc
         - match: ':\)'
           scope: punctuation.definition.closure.inline.literal.end.lpc
           pop: true
         # most statements are valid here, this probably needs honing.
+        - include: closure-inline-literal-argument
         - include: lex
         - include: call
         - include: support-function
-  closure-inline-verbose:
+  closure-inline-verbose: #TODO: not a super specific context
     - match: \bfunction\b
-      scope: closure.inline.verbose.lpc
+      scope: closure.inline.verbose.lpc #TODO actually this is some type of keyword?
       push:
         - include: value-type
         - include: parens
@@ -94,13 +95,15 @@ contexts:
           push:
             - meta_scope: closure.inline.verbose.context.lpc
             - include: lex
-            - match: '{'
+            - match: '(?<={)'
               pop: true
+
         - include: block
-        - match: '};'
+        - match: '(?<=})\s*;?'
           pop: true
   closure-lambda-arguments:
     - include: symbol
+    - include: comments
     - match: (?=\s*\}\))
       pop: true
     - match: ','
@@ -117,28 +120,33 @@ contexts:
     - match: (?=\s*\}\))
       pop: true
   closure-lambda:
+    - include: comments
     - match: \s*\b(unbound_)?lambda\s*
       scope: support.function.efun.lpc
       push:
+        - include: comments
+        - meta_content_scope: closure.lambda
         - match: \(\s*
           push:
-            - meta_content_scope: closure.lambda
-            - match: '\(\{\s*' # start arguments
+          - include: comments
+          - match: 0\s*
+            scope: closure.lambda.arguments
+            pop: true
+          - match: '\(\{\s*' # start arguments
+            push:
+              - meta_content_scope: closure.lambda.arguments
+              - include: closure-lambda-arguments
+          - match: \s*\}\)
+            pop: true
+        - match: '\s*,\s*'
+          push:
+            - include: comments
+            - match: '\(\{\s*' # start function
               push:
-                - meta_content_scope: closure.lambda.arguments
+                - meta_content_scope: closure.lambda.function
                 - match: \s*\}\)
                   pop: true
-                - include: closure-lambda-arguments
-            - match: '\s*,\s*'
-              push:
-                - match: '\(\{\s*' # start function
-                  push:
-                    - meta_content_scope: closure.lambda.function
-                    - match: \s*\}\)
-                      pop: true
-                    - include: closure-lambda-function
-                - match: (?=\s*\))
-                  pop: true
+                - include: closure-lambda-function
             - match: (?=\s*\))
               pop: true
         - match: \s*\)
@@ -147,7 +155,7 @@ contexts:
     - match: '#'''
       scope: closure.simple
       push:
-        - match: '[\[(,=&|?\-][<.{\[<|&!>]*'
+        - match: '[\[(,=&|?\-+</>\*][<.{\[<|&!>\]=\-+]*'
           scope: closure.simple.operator
           pop: true
         - match: ({{identifier}})?(::)
@@ -315,11 +323,11 @@ contexts:
     - include: lex-core
     - include: lex-keyword
   lex-keyword:
-    - match: \s*\b(break|case|continue|do|else|for(each)?|if|return|switch|while)\b
+    - match: \s*\b(break|case|continue|default|do|else|for(each)?|if|return|switch|while)\b
       captures:
         1: keyword.control.lpc
     - include: value-type
-    - match: \s*\b(nosave|private|public|static|(deprecated))\b
+    - match: \s*\b(nosave|private|public|static|varargs|(deprecated))\b
       captures:
         1: storage.modifier.variable.lpc
         2: invalid.deprecated.variable.lpc
@@ -337,6 +345,8 @@ contexts:
       scope: keyword.operator.logical.lpc
     - match: (~|&|\||\^|<<|>>)
       scope: keyword.operator.bitwise.lpc
+    - match: \.\.\.
+      scope: keyword.operator.flatten.lpc
     - match: '(\.|->)(?=(?:\s|/\*.*?\*/)*+[A-Za-z_]\w*+)'
       scope: keyword.operator.dereference.lpc
   lex-number:
@@ -442,6 +452,8 @@ contexts:
     - match: \(
       push:
         - meta_scope: meta.parens.lpc
+        # - match: \.\.\.
+        #   scope: flatten-operator
         - match: (?=\))
           pop: true
         - include: statement
@@ -457,7 +469,7 @@ contexts:
           pop: true
         - include: lex-core
   ppline-directive:
-    - match: ^\s*(#)\s*(if|ifdef|ifndef|elif|else|endif|pragma|line|define|undef|error|warning)\b
+    - match: ^\s*(#)\s*(if|ifdef|ifndef|elif|else|endif|pragma|line|define|undef|echo)\b
       captures:
         0: keyword.other.preprocessor.lpc
       push:
@@ -466,13 +478,13 @@ contexts:
           pop: true
         - include: lex-core
   ppline-directive-invalid-usage:
-    - match: (^\s*(#)\s*(if|ifdef|ifndef|elif|pragma|define|undef|include)\b)\s*?(\n|$)
+    - match: (^\s*(#)\s*(if|ifdef|ifndef|elif|pragma|define|undef|include|echo)\b)\s*?(\n|$)
       scope: meta.preprocessor.directive.lpc
       captures:
         1: keyword.other.preprocessor.lpc
         4: invalid.illegal.invalid-usage-of-preprocessor-directive.lpc
   ppline-include:
-    - match: ^\s*(#)\s*(include|include_next|import)\b
+    - match: ^\s*(#)\s*(include)\b
       captures:
         0: keyword.other.preprocessor.include.lpc
       push:
@@ -692,6 +704,8 @@ contexts:
     - include: comments
     - include: lex-continuation
   statement:
+    - include: closure-inline-literal-argument
+    - include: comments
     - include: closure
     - include: array-literal
     - include: mapping-literal

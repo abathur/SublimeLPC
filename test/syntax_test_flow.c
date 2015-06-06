@@ -1,7 +1,7 @@
 // SYNTAX TEST "Packages/User/LPC/LPC.sublime-syntax"
 //demonstrate flow-control keywords and some related concepts
 
-void flow()
+void reset()
 {
 	mixed tricky;
 	if(1)
