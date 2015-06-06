@@ -116,6 +116,10 @@ Test cases:
         ☐ convert the above into ST3 syntax "test" format
           see bottom of http://www.sublimetext.com/docs/3/syntax.html
 
+Known issues & compromises:
+    ☐ I've used an aggressive matching for the $1 style inline closure argument because the wide variety of contexts we can see inside the closure make it hard to match otherwise. What I mean is that $\d+ will get identified as an inline closure argument almost anywhere it turns up in code. I suspect this is the best compromise, but it's also a perfectly valid identifier; I suppose someone may have code explicitly declaring variables with names that match this selector.
+    ☐ matching for the flatten operator feels a little ham-fisted at the moment; it'll highlight anywhere even though its validity is pretty limited.
+
 Idiomatic environment-specific support:
     While core LPC highlighting is certainly a big step up from what most of us have been dealing with, we'd all probably also benefit from figuring out how to match some more environment-specific items. This probably looks like file (either in Python or LPC) which takes a templated version of LPC.sublime-syntax and fills it in with MUD-specific details.
     ☐ common mudlib applies (though this begs the question of what version to support)

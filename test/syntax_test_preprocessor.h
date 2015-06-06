@@ -16,8 +16,8 @@ Test out the preprocessor
 
 #undef TEST3 3
 
-#echo //test
-#echo test2
+#echo //test (the presence of this comment breaks the next line, happens not just for echo)
+#echo test2 //TODO
 #echo 1
 
 #line 1
