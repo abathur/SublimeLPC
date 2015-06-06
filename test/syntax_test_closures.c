@@ -1,5 +1,5 @@
 // SYNTAX TEST "Packages/User/LPC/LPC.sublime-syntax"
-object efuns()
+closure efuns()
 {
 	this_object();
 	efun::this_object();
@@ -15,7 +15,7 @@ object efuns()
 	object obj;
 	obj = this_object();
 	obj = efun::this_object();
-	obj = #'this_object;
+	obj = funcall(#'this_object);
 }
 
 void reset(int arg)
@@ -130,7 +130,7 @@ void documented_complex()
             ({
             	(#'do),
               	({ (#'write),'i }),  // give out i
-              	({ (#'+=),'i,1 })    // increase i
+              	({ (#'+=),'i,1 }),    // increase i
               	({ (#'<),'i,10 }),   // condition: i < 10
               	42                   // result is not interesting
            	})
@@ -142,7 +142,7 @@ void documented_complex()
     		(#'while),// loop
 			1,        // condition is 1 ==> endles loop
 			42,       // return value (which will never be used)
-			({ (#'write), "grin" })
+			({ (#'write),"grin" }),
 			({ (#'?!),               // ifnot
 				({ (#'random),10 }),  //       (random(10))
 				({ (#'return),100 })  //   return 100;

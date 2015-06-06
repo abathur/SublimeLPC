@@ -7,8 +7,10 @@ Test out the preprocessor
 #define crouching_tiger_hidden_macro(I,A) member((A),(I))
 #endif
 
+#define ST_BASE __DIR__ + "syntax_test_"
+
 #ifndef INHERIT_TEST
-#define INHERIT_TEST __DIR__ + "operators.c"
+#define INHERIT_TEST ST_BASE + "operators.c"
 #endif
 #define TEST2 2
 #define TEST3 /* stay in school */ ({1, "two", 3.3333})

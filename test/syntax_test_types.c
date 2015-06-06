@@ -59,9 +59,13 @@ struct StructBlue types_literal_g2 = (<StructBlue> 1, "ok");
 /* union types */
 #if LDMUD_VERSION >= VERSION(3, 5, 0)
 
-closure|float|int|mapping|mixed|object|string|struct StructBlue|symbol|void union_a;
-<closure|float|int|mapping|mixed|object|string|struct StructBlue|symbol|void>* union_b;
-closure *|float*|int *|mapping *|mixed *|object *|string *|struct StructBlue *|symbol *|void * union_c;
+closure|float union_aa;
+closure|float|int|mapping|mixed|object union_ab;
+closure|float|int|mapping|mixed|object|string union_ac;
+
+closure|float|int|mapping|mixed|object|string|struct StructBlue|symbol union_a;
+<closure|float|int|mapping|mixed|object|string|struct StructBlue|symbol>* union_b;
+closure *|float*|int *|mapping *|mixed *|object *|string *|struct StructBlue *|symbol * union_c;
 <closure|float>*|struct StructBlue * union_d; //not positive this is valid
 #endif
 
@@ -123,9 +127,9 @@ struct StructBlue post_structuralism(int one, struct StructOne two, string three
 
 /* union types */
 #if LDMUD_VERSION >= VERSION(3, 5, 0)
-private varargs <int|float>*|struct StructBlue * lets_get_meta_structural(int|float arg1a, int*|float* arg1b, <int|float>* arg1c, struct StructOne two, varargs string * extra);
+private varargs <int|float>*|struct StructOne * lets_get_meta_structural(int|float arg1a, int*|float* arg1b, <int|float>* arg1c, struct StructOne * two, varargs string * extra);
 
-private varargs <int|float>*|struct StructBlue * lets_get_meta_structural(int|float arg1a, int*|float* arg1b, <int|float>* arg1c, struct StructOne * two, varargs string * extra)
+private varargs <int|float>*|struct StructOne * lets_get_meta_structural(int|float arg1a, int*|float* arg1b, <int|float>* arg1c, struct StructOne * two, varargs string * extra)
 {
 	if(random(2))
 	{
@@ -135,6 +139,17 @@ private varargs <int|float>*|struct StructBlue * lets_get_meta_structural(int|fl
 	{
 		return two;
 	}
+}
+#endif
+
+/* test deprecated modifier */
+#if LDMUD_VERSION >= VERSION(3, 3, 720)
+//not 100% sure the driver will let us use this as a variable name
+deprecated int danger = 1; //TODO: should only match modifiers before type(s)? modifiers after type as error? something...
+deprecated int dont_call_me_bro();
+deprecated int dont_call_me_bro()
+{
+	danger = 2; //should be a deprecation warning
 }
 #endif
 
@@ -198,9 +213,9 @@ void types()
 
 /* union types */
 #if LDMUD_VERSION >= VERSION(3, 5, 0)
-	closure|float|int|mapping|mixed|object|string|struct StructBlue|symbol|void local_union_a;
-	<closure|float|int|mapping|mixed|object|string|struct StructBlue|symbol|void>* local_union_b;
-	closure *|float*|int *|mapping *|mixed *|object *|string *|struct StructBlue *|symbol *|void * local_union_c;
+	closure|float|int|mapping|mixed|object|string|struct StructBlue|symbol local_union_a;
+	<closure|float|int|mapping|mixed|object|string|struct StructBlue|symbol>* local_union_b;
+	closure *|float*|int *|mapping *|mixed *|object *|string *|struct StructBlue *|symbol *local_union_c;
 	<closure|float>*|struct StructBlue * local_union_d; //not positive this is valid
 #endif
 
@@ -251,14 +266,3 @@ void types()
 	dont_call_me_bro(); //should be a deprecation warning
 #endif
 }
-
-/* test deprecated modifier */
-#if LDMUD_VERSION >= VERSION(3, 3, 720)
-//not 100% sure the driver will let us use this as a variable name
-deprecated int deprecated = 1; //TODO: should only match modifiers before type(s)
-deprecated int dont_call_me_bro();
-deprecated int dont_call_me_bro()
-{
-	deprecated = 2; //should be a deprecation warning
-}
-#endif
