@@ -18,11 +18,6 @@ closure efuns()
 	obj = funcall(#'this_object);
 }
 
-void reset(int arg)
-{
-	funcall(#'efuns); //implicit lfuns test
-}
-
 int foo(int x)
 {
 	return ((x*2) > 42);
@@ -177,24 +172,23 @@ void documented_complex()
 			21
 		})
 	)));
-
 	map(
-		filter(map(users(), (:all_inventory(environment($1)):)), #'living),
+		flatten_array(map(users(), (:filter(all_inventory(environment($1)), #'living):))), //TODO: parenthesis mismatch?
 		lambda(
 			({ 'liv }),
 			({#', ,
 				({#'=, 'hp,
-					({#'call_other, 'liv, "QueryHP" })
+					({#'call_other, 'liv, "query_hp" })
 				}),
 				({#'?,
 					({#'>, 'hp, 10 }),
-					({#'call_other, 'liv, "SetHP",
+					({#'call_other, 'liv, "set_hp",
 						({#'-, 'hp, 10 })
 					})
                 })
           	})
         ) // of lambda()
-    );
+    ); //TODO: indent?
 }
 
 int global_var;
@@ -242,4 +236,11 @@ void documented_simple()
 	simple_closure = #'sscanf;
 	simple_closure = #'switch;
 	simple_closure = #'global_var; //can't syntactically distinguish this from an lfun
+}
+
+void reset(int arg)
+{
+	funcall(#'efuns); //implicit lfuns test
+	documented_simple();
+	documented_complex();
 }

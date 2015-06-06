@@ -21,12 +21,6 @@ public int operators()
 	syntax_test_operators::operators();
 }
 
-void reset(int arg)
-{
-	"*"::reset();
-	efuns();
-}
-
 //modifiers, declarations, definitions, literals, and assignments are also all tested here;
 //implicitly tests efuns if they aren't tested better elsewhere; closures partially tested via literals, but they're more thoroughly exercised in closures.c
 #include "syntax_test_types.c"
@@ -50,5 +44,14 @@ void indexing()
 	//mappings
 	types_literal_f["one"];
 	types_literal_f["one", 1];
-	types_literal_f[1, 2];
+	types_literal_f[1, 0];
+}
+
+void reset(int arg)
+{
+	"*"::reset();
+	efuns();
+	operators();
+	indexing();
+	types();
 }
