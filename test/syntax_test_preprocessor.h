@@ -12,14 +12,13 @@ Test out the preprocessor
 #ifndef INHERIT_TEST
 #define INHERIT_TEST ST_BASE + "operators.c"
 #endif
-#define TEST2 2
+#define TEST2 2 //don't do drugs
 #define TEST3 /* stay in school */ ({1, "two", 3.3333})
 #pragma rtt_checks, strict_types
 
 #undef TEST3 3
 
-#echo //test (the presence of this comment breaks the next line, happens not just for echo)
-#echo test2 //TODO
+#echo test2
 #echo 1
 
 #line 1

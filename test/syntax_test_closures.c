@@ -173,12 +173,14 @@ void documented_complex()
 		})
 	)));
 	map(
-		flatten_array(map(users(), (:filter(all_inventory(environment($1)), #'living):))), //TODO: parenthesis mismatch?
+		flatten_array(map(users(), (:filter(all_inventory(environment($1)), #'living):))),
 		lambda(
 			({ 'liv }),
 			({#', ,
-				({#'=, 'hp,
+				({#'=,
+					'hp,
 					({#'call_other, 'liv, "query_hp" })
+
 				}),
 				({#'?,
 					({#'>, 'hp, 10 }),
@@ -188,7 +190,7 @@ void documented_complex()
                 })
           	})
         ) // of lambda()
-    ); //TODO: indent?
+    );
 }
 
 int global_var;

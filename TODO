@@ -32,6 +32,9 @@ Need to answer some philosophical questions probably.
     ☐ Is there any meaningful value we can give first-line-match?
       I can't imagine we're all going to go insert a line into thousands of files; I don't think we have anything that can be reliably matched, ourselves.
 
+    ☐ How aggressively should the syntax definition try to flag syntax problems (like variable/function modifiers after)?
+      It seems perfectly reasonable for them to be in the syntax def, but it also means the syntax def is always using more resources to hunt for rarely-made problems the compiler can cure you of reasonably effectively. It might be more reasonable if we had a shortlist of shit people familiar with LPC still accidentally do all the time.
+
 General:
     ☐ make sure all unnecessary C support is actually gone
       I've done some a fair amount of slash-and-burn, but oftentimes it isn't as simple as pruning a wholly unused feature, but more about modifying an existing match to remove parts that are irrelevant to us.
@@ -73,6 +76,7 @@ Matching & language features:
         ✔ inherit @done (15-05-31 23:11)
             ✔ default visibility modifiers @done (15-05-31 23:11)
             ✔ virtual @done (15-05-31 23:11)
+            ☐ Very brute-force atm, may be a more maintainable/graceful path forward
         ✔ keywords: break, case, continue, do, else, for(each), if, return, switch, while @done (15-05-31 23:17)
         ☐ literals
             ✔ arrays @done (15-05-31 23:17)
@@ -82,11 +86,14 @@ Matching & language features:
             ✔ numbers (int, float, 0x, 0b, 0o) @done (15-05-31 23:17)
             ✔ string (double quoted) @done (15-05-31 23:21)
                 ✔ LPC sprintf format @done (15-05-31 23:22)
+                    ☐ This looks largely fine at a visual layer from this distance, but I suspect this is one of the areas where everyone could benefit from some time investment into identifying invalid combinations, missing parts, etc.
             ✔ structs @done (15-05-31 23:17)
             ✔ symbols @done (15-05-31 23:25)
         ☐ type unions
             ✔ basic support @done (15-05-31 23:27)
             ☐ mixing bracketed and regular unions
+            ☐ making sure full unions can be meaningfully styled if someone desires
+            ☐ not strictly a union issue, but also need to match the new ** syntax for array of <Type> arrays.
         ☐ variables
           Not sure advanced support's really necessary here
             ✔ types @done (15-05-31 23:28)
@@ -101,6 +108,7 @@ Naming:
         ☐ semicolon in mapping row
         ☐ # and ' in simple closure syntax, ' in symbol syntax
           (documentation often calls these 'lfun' closures, but I resist using this name here as this closure operator is also combined with operators, efuns, sefuns and flow control keywords)
+        ☐ * and ** for array types
         ☐ variable expansion/unpack operator (...)
         ☐ < in array indexing
         ☐ -> call-other & struct reference operator

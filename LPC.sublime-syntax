@@ -70,7 +70,7 @@ contexts:
   closure-inline-literal-argument:
     - match: \$\d+
       scope: closure.inline.literal.parameter.lpc
-  closure-inline-literal: #todo scope just the literal (::)?
+  closure-inline-literal:
     - match: (\(:)
       captures:
         1: punctuation.definition.closure.inline.literal.start.lpc
@@ -84,9 +84,9 @@ contexts:
         - include: lex
         - include: call
         - include: support-function
-  closure-inline-verbose: #TODO: not a super specific context
+  closure-inline-verbose:
     - match: \bfunction\b
-      scope: closure.inline.verbose.lpc #TODO actually this is some type of keyword?
+      scope: keyword.other.closure.inline.verbose.lpc
       push:
         - include: value-type
         - include: parens
@@ -155,7 +155,7 @@ contexts:
     - match: '#'''
       scope: closure.simple
       push:
-        - match: '[\[(,=&|?\-+</>\*][<.{\[<|&!>\]=\-+]*'
+        - match: '(?<=#'')[\[(,=&|?\-+</>\*][<.{\[<|&!>\]=\-+]*'
           scope: closure.simple.operator
           pop: true
         - match: ({{identifier}})?(::)
@@ -163,7 +163,7 @@ contexts:
             2: meta.function-call.super.lpc
             3: keyword.operator.inherited.lpc
         - include: support-function
-        - include: lex-keyword # TODO this can be vastly improved, but we'll need a list of valid
+        - include: lex-keyword
         - match: '{{identifier}}'
           scope: closure.simple.lfun
         - match: \b
@@ -191,7 +191,8 @@ contexts:
         0: punctuation.definition.comment.lpc
       push:
         - meta_scope: comment.line.double-slash.lpc
-        - match: '(?<=^|[^\\])\s*(?=\n)$\n?'
+        - match: '(?<=^|[^\\])\s*(?=\n$\n?)'
+          scope: pissybritches
           pop: true
         - include: lex-continuation
   default_visibility:
@@ -226,7 +227,7 @@ contexts:
         2: invalid.deprecated.function.lpc
   function-declaration:
     - include: function-modifier
-    - include: value-type # should probably be a warning/invalid type if absent?
+    - include: value-type # should probably be a warning/invalid type if absent, yeah?
     - match: |-
         (?x)
           (?<![=])
@@ -246,7 +247,6 @@ contexts:
   function-definition:
     - include: function-modifier
     - include: value-type
-    # TODO I suspect this match can be honed further
     - match: |-
         (?x)
           \s*
@@ -275,7 +275,7 @@ contexts:
           pop: true
         - include: lex
         - include: parens-lookahead-end
-  inherit: #TODO this could be more graceful and less brute-force...?
+  inherit:
     - match: ^(?=.*\binherit\s+)(?=.*;)
       push:
         - meta_scope: keyword.other.inherit.statement.lpc #better scope?
@@ -376,7 +376,6 @@ contexts:
         - include: lex-continuation
         - include: string_escaped_char
         - include: string_placeholder
-    #TODO: I bet this still needs much work; a robust test case would be nice.
     - match: |-
           (?x)
             '(?=
@@ -390,7 +389,6 @@ contexts:
               .
             ')
 
-            #"(?<!#)'"
       captures:
         0: punctuation.definition.string.begin.lpc
       push:
@@ -475,6 +473,7 @@ contexts:
       push:
         - meta_scope: meta.preprocessor.directive.lpc
         - match: '(?<=^|[^\\])\s*(?=\n)$\n?'
+          scope: poopypants
           pop: true
         - include: lex-core
   ppline-directive-invalid-usage:
@@ -846,7 +845,7 @@ contexts:
         0: symbol-entity
         1: symbol-punctuation
         2: symbol-identifier
-  value-type: # straight types, array types, and union types
+  value-type:
     - include: value-type-union
     - include: value-type-single
   value-type-single:
@@ -854,10 +853,8 @@ contexts:
       captures:
         1: storage.type.lpc
         2: entity.name.struct.lpc
-        4: storage.type.array.lpc # should this be thought of as an operator?
-  value-type-union: #todo this roughly works but needs better handling of a mix of regular and bracketed unions.
-    # int * | float * blah means blah can be an array of ints OR an array of floats.
-    # <int|float>* blah means blah can be an array that holds int or float.
+        4: storage.type.array.lpc
+  value-type-union:
     - match: <(?={{value_types}}\s*\|)
       scope: punctuation.union.array.start.lpc
       push:

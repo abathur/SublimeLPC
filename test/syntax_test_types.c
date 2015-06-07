@@ -50,7 +50,6 @@ closure types_literal_e4 = function int (int val) : int x = 2 * types_literal_b 
 #endif
 mapping types_literal_f = ([1:2;3, "one":"two";"three"]);
 
-//TODO: something goes awry in the struct
 struct StructOne types_literal_g1 = (<StructOne>
 	one_a: #'this_object,
 	one_b: 1.11, one_c: 111,
@@ -108,7 +107,7 @@ public struct StructBlue * func_complex_types_d();
 static mapping * func_complex_types_e();
 
 			//varargs
-static varargs struct StructBlue * func_complex_types_f(int * arg1, struct StructBlue blue, varargs string * extra); //TODO: varargs missed in argument context
+static varargs struct StructBlue * func_complex_types_f(int * arg1, struct StructBlue blue, varargs string * extra);
 
 	//definitions
 		//simple
@@ -151,7 +150,7 @@ private varargs <int|float>*|struct StructOne * lets_get_meta_structural(int|flo
 /* test deprecated modifier */
 #if LDMUD_VERSION >= VERSION(3, 3, 720)
 //not 100% sure the driver will let us use this as a variable name
-deprecated int danger = 1; //TODO: should only match modifiers before type(s)? modifiers after type as error? something...
+deprecated int danger = 1;
 deprecated int dont_call_me_bro();
 deprecated int dont_call_me_bro()
 {
@@ -208,7 +207,6 @@ void types()
 #endif
 	mapping local_types_literal_f = ([1:2;3, "one":"two";"three"]);
 
-	//TODO: something goes awry in the struct
 	struct StructOne local_types_literal_g1 = (<StructOne>
 		one_a: #'this_object,
 		one_b: 1.11, one_c: 111,
@@ -241,7 +239,6 @@ void types()
 	local_types_literal_a = 1.1333333;
 
 	//some more advanced int/char literals
-	//TODO: symbol matching too aggressively;
 	local_types_literal_b = 0x1000 + 0o000 + 0b000 + 'x' + ';' + 'a';
 
 	local_types_literal_c = "super calloused"+ "fragile mystic";
@@ -267,7 +264,6 @@ void types()
 #endif
 	local_types_literal_f = ([1:2;3, "one":"two";"three"]);
 
-	//TODO: something goes awry in the struct
 	local_types_literal_g1 = (<StructOne>
 		one_a: #'this_object,
 		one_b: 1.11, one_c: 111,
