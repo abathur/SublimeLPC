@@ -5,10 +5,10 @@ This is an early working draft of Sublime Text 3 syntax highlighting for the LPC
 
 While you can see the TODO file in root for my current working notes if you'd like to help, the TLDR version is that I could use your help with a short list of things:
 
-	1. naming scopes
-	2. identifying missing language features or edge cases in current matching
-	3. gathering feedback on the "Open" questions in the TODO
-	4. filling out a robust, compiling test of the LPC language (see /test for work in progress), and (once scopes are mostly settled) converting it into an ST3 syntax test.
+1. naming scopes
+2. identifying missing language features or edge cases in current matching
+3. gathering feedback on the "Open" questions in the TODO
+4. filling out a robust, compiling test of the LPC language (see /test for work in progress), and (once scopes are mostly settled) converting it into an ST3 syntax test.
 
 If you have any business installing this at this point, you should be able to figure out how to do so from the ST3 documentation. (In short, it should suffice to git clone this into your ST3/Packages/User/) directory, open up an LPC file, and select LPC, or User->LPC for your syntax.
 
