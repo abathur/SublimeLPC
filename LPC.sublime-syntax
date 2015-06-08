@@ -23,11 +23,11 @@ contexts:
     - include: translation_unit
   array-literal:
     - match: '\({'
-      scope: punctuation.definition.array.literal.start.lpc
+      scope: punctuation.definition.array.start.lpc
       push:
-        - meta_scope: meta.array.literal.lpc
+        - meta_scope: meta.array.lpc
         - match: '}\)'
-          scope: punctuation.definition.array.literal.end.lpc
+          scope: punctuation.definition.array.end.lpc
           pop: true
         - include: statement
   block:
@@ -69,13 +69,13 @@ contexts:
     - include: closure-inline-verbose
   closure-inline-literal-argument:
     - match: \$\d+
-      scope: closure.inline.literal.parameter.lpc
+      scope: meta.closure.inline.literal.parameter.lpc
   closure-inline-literal:
     - match: (\(:)
       captures:
         1: punctuation.definition.closure.inline.literal.start.lpc
       push:
-        - meta_scope: closure.inline.literal.lpc
+        - meta_scope: meta.closure.inline.literal.lpc
         - match: ':\)'
           scope: punctuation.definition.closure.inline.literal.end.lpc
           pop: true
@@ -88,16 +88,16 @@ contexts:
     - match: \bfunction\b
       scope: keyword.other.closure.inline.verbose.lpc
       push:
+        - meta_scope: meta.closure.inline.verbose.lpc
         - include: value-type
         - include: parens
         - include: lex
-        - match: '\s*:\s*(?=.*{)'
+        - match: '\s*:\s*(?=.*\{)'
           push:
-            - meta_scope: closure.inline.verbose.context.lpc
+            - meta_scope: meta.closure.inline.verbose.context.lpc
             - include: lex
-            - match: '(?<={)'
+            - match: '(?={)'
               pop: true
-
         - include: block
         - match: '(?<=})\s*;?'
           pop: true
@@ -125,16 +125,16 @@ contexts:
       scope: support.function.efun.lpc
       push:
         - include: comments
-        - meta_content_scope: closure.lambda
+        - meta_content_scope: meta.closure.lambda
         - match: \(\s*
           push:
           - include: comments
           - match: 0\s*
-            scope: closure.lambda.arguments
+            scope: meta.closure.lambda.arguments.lpc
             pop: true
           - match: '\(\{\s*' # start arguments
             push:
-              - meta_content_scope: closure.lambda.arguments
+              - meta_content_scope: meta.closure.lambda.arguments.lpc
               - include: closure-lambda-arguments
           - match: \s*\}\)
             pop: true
@@ -143,7 +143,7 @@ contexts:
             - include: comments
             - match: '\(\{\s*' # start function
               push:
-                - meta_content_scope: closure.lambda.function
+                - meta_content_scope: meta.closure.lambda.function.lpc
                 - match: \s*\}\)
                   pop: true
                 - include: closure-lambda-function
@@ -153,19 +153,20 @@ contexts:
           pop: true
   closure-simple:
     - match: '#'''
-      scope: closure.simple
+      scope: punctuation.definition.closure.simple.lpc
       push:
+        - meta_scope: meta.closure.simple.lpc
         - match: '(?<=#'')[\[(,=&|?\-+</>\*][<.{\[<|&!>\]=\-+]*'
-          scope: closure.simple.operator
+          scope: meta.closure.simple.operator.lpc
           pop: true
         - match: ({{identifier}})?(::)
           captures:
             2: meta.function-call.super.lpc
-            3: keyword.operator.inherited.lpc
+            3: keyword.operator.super.lpc
         - include: support-function
         - include: lex-keyword
         - match: '{{identifier}}'
-          scope: closure.simple.lfun
+          scope: meta.closure.simple.lfun.lpc
         - match: \b
           pop: true
   comments:
@@ -192,26 +193,25 @@ contexts:
       push:
         - meta_scope: comment.line.double-slash.lpc
         - match: '(?<=^|[^\\])\s*(?=\n$\n?)'
-          scope: pissybritches
           pop: true
         - include: lex-continuation
   default_visibility:
     - match: ^(?=default\s+.*;)
       push:
-        - meta_scope: keyword.other.default-scope.lpc
+        - meta_scope: meta.default.lpc
         - match: default\s+
           captures:
-            0: keyword.other.scope.default.lpc
+            0: keyword.other.default.lpc
         - match: '{{bulk_global_scoping}}'
           captures:
-            1: keyword.other.scope.default.lpc
-            2: keyword.other.scope.default.visibility.lpc keyword.other.visibility.scope.default.lpc
-            3: keyword.other.scope.default.type.lpc
+            1: meta.modifiers.default.lpc
+            2: storage.modifier.default.lpc #keyword.other.scope.inherit.visibility.lpc keyword.other.visibility.scope.inherit.lpc
+            3: storage.type.default.lpc
         - match: '{{bulk_global_scoping}}'
           captures:
-            1: keyword.other.scope.default.lpc
-            2: keyword.other.scope.default.visibility.lpc keyword.other.visibility.scope.default.lpc
-            3: keyword.other.scope.default.type.lpc
+            1: meta.modifiers.default.lpc
+            2: storage.modifier.default.lpc #keyword.other.scope.inherit.visibility.lpc keyword.other.visibility.scope.inherit.lpc
+            3: storage.type.default.lpc
         - match: .?(?:;)
           pop: true
     - match: ;
@@ -278,17 +278,17 @@ contexts:
   inherit:
     - match: ^(?=.*\binherit\s+)(?=.*;)
       push:
-        - meta_scope: keyword.other.inherit.statement.lpc #better scope?
+        - meta_scope: meta.inherit.lpc #better scope?
         - match: '{{bulk_global_scoping}}'
           captures:
-            1: keyword.other.scope.inherit.lpc
-            2: keyword.other.scope.inherit.visibility.lpc keyword.other.visibility.scope.inherit.lpc
-            3: keyword.other.scope.inherit.type.lpc
+            1: meta.modifiers.inherit.lpc
+            2: storage.modifier.inherit.lpc #keyword.other.scope.inherit.visibility.lpc keyword.other.visibility.scope.inherit.lpc
+            3: storage.type.inherit.lpc
         - match: '{{bulk_global_scoping}}'
           captures:
-            1: keyword.other.scope.inherit.lpc
-            2: keyword.other.scope.inherit.visibility.lpc keyword.other.visibility.scope.inherit.lpc
-            3: keyword.other.scope.inherit.type.lpc
+            1: meta.modifiers.inherit.lpc
+            2: storage.modifier.inherit.lpc #keyword.other.scope.inherit.visibility.lpc keyword.other.visibility.scope.inherit.lpc
+            3: storage.type.inherit.lpc
         - match: \bvirtual\s+
           captures:
             0: keyword.other.inherit.virtual.lpc
@@ -376,6 +376,7 @@ contexts:
         - include: lex-continuation
         - include: string_escaped_char
         - include: string_placeholder
+    #todo fix [dunno]
     - match: |-
           (?x)
             '(?=
@@ -390,56 +391,50 @@ contexts:
             ')
 
       captures:
-        0: punctuation.definition.string.begin.lpc
+        0: string.punctuation.definition.character.begin.lpc
       push:
-        - meta_scope: string.quoted.single.lpc
+        - meta_scope: constant.character.lpc
         - match: '('')|(?<=^|[^\\])\s*(\n)'
           captures:
-            1: punctuation.definition.string.end.lpc
+            1: punctuation.definition.character.end.lpc
             2: invalid.illegal.unexpected-end-of-line.lpc
           pop: true
         - include: lex-continuation
         - include: string_escaped_char
   mapping-literal:
     - match: '\(\['
-      scope: punctuation.definition.mapping.literal.start.lpc
+      scope: punctuation.definition.mapping.start.lpc
       push:
-        - meta_content_scope: mapping.literal.row
-        - include: mapping-literal-row
-        - match: ']\)'
-          scope: punctuation.definition.mapping.literal.end.lpc
+        - meta_scope: meta.mapping.lpc
+        - match: (?<=\(\[|,)\s*
+          push:
+            - meta_scope: meta.mapping.key.lpc
+            - match: (?=:|,)
+              pop: true
+            - include: statement
+        - match: (?=]\))
           pop: true
-  mapping-literal-key:
-    - match: ':'
-      scope: mapping.key-value-separator
-      set:
-        - meta_content_scope: mapping.literal.value
-        - include: mapping-literal-value
-    - match: ','
-      scope: mapping.row-separator
-      pop: true
-    - include: statement
-  mapping-literal-value:
-    - match: ;
-      scope: mapping.value-value-separator
-      set:
-        - meta_content_scope: mapping.literal.value
-        - include: mapping-literal-value
-    - match: ','
-      scope: mapping.row-separator
-      set:
-        - meta_content_scope: mapping.literal.row
-        - include: mapping-literal-row
-    - match: '\s*(?=]\))'
-      pop: true
-    - include: statement
-  mapping-literal-row:
-    - match: (?<=.)
-      set:
-        - meta_content_scope: mapping.literal.key
-        - include: mapping-literal-key
-    - match: '\s*(?=]\))'
-      pop: true
+        - match: ':'
+          scope: punctuation.separator.mapping.key-value.lpc
+          push:
+            - meta_content_scope: meta.mapping.value.lpc
+            - match: '(?=,|]\))'
+              pop: true
+            - match: ';'
+              scope: punctuation.separator.mapping.value-value.lpc
+            - include: statement
+        - match: ','
+          scope: punctuation.separator.mapping.row.lpc
+        - include: statement
+    - match: ']\)'
+      scope: punctuation.definition.mapping.end.lpc
+
+  # mapping-literal-row:
+  #   - meta_content_scope: whatever
+  #   - match: .
+  #     scope: sigh
+  #     pop: true
+
   parens:
     - match: (?=\()
       push:
@@ -473,7 +468,6 @@ contexts:
       push:
         - meta_scope: meta.preprocessor.directive.lpc
         - match: '(?<=^|[^\\])\s*(?=\n)$\n?'
-          scope: poopypants
           pop: true
         - include: lex-core
   ppline-directive-invalid-usage:
@@ -750,7 +744,7 @@ contexts:
           scope: entity.name.struct.lpc
         - match: '>'
           push:
-            - meta_content_scope: struct-literal-row
+            - meta_content_scope: meta.struct.literal.row.lpc
             - include: struct-literal-row
         - match: '\)'
           scope: punctuation.definition.struct.literal.end.lpc
@@ -758,23 +752,23 @@ contexts:
   struct-literal-row:
     - match: (?<=.)
       set:
-        - meta_content_scope: struct-literal-key
+        - meta_content_scope: meta.struct.literal.key.lpc
         - include: struct-literal-key
     - match: '(?=\s*[)])'
       pop: true
   struct-literal-key:
     - match: '(:)\s*|(?=[^:]*[,)])'
       captures:
-        1: struct-key-value-separator # i.e., the colon
+        1: punctuation.separator.key-value.struct.lpc # i.e., the colon
       set:
-        - meta_content_scope: struct-literal-value
+        - meta_content_scope: meta.struct.literal.value.lpc
         - include: struct-literal-value
     - match: ',\s*'
       pop: true
   struct-literal-value:
     - match: ',\s*'
       set:
-        - meta_content_scope: struct-literal-row
+        - meta_content_scope: meta.struct.literal.row.lpc
         - include: struct-literal-row
     - include: statement
     - match: '(?=\s*[)])'
@@ -842,9 +836,9 @@ contexts:
   symbol:
     - match: "(')({{identifier}})"
       captures:
-        0: symbol-entity
-        1: symbol-punctuation
-        2: symbol-identifier
+        0: meta.symbol.lpc
+        1: punctuation.definition.symbol.lpc
+        2: variable.other.symbol
   value-type:
     - include: value-type-union
     - include: value-type-single
@@ -856,21 +850,21 @@ contexts:
         4: storage.type.array.lpc
   value-type-union:
     - match: <(?={{value_types}}\s*\|)
-      scope: punctuation.union.array.start.lpc
+      scope: punctuation.definition.union.array.start
       push:
         - meta_content_scope: storage.type.union.lpc
         - match: '(>)\s*(\*)?(\s*\|)?'
           captures:
-            1: punctuation.union.array.end.lpc
+            1: punctuation.definition.union.array.end
             2: storage.type.array.lpc
-            3: type_union_operator
+            3: punctuation.separator.union.lpc
           pop: true
         - include: value-type-single
     - match: '(?={{value_types}}\s*\|)'
       push:
         - meta_content_scope: storage.type.union.lpc
         - match: '\|'
-          scope: type_union_operator
+          scope: punctuation.separator.union.lpc
         - include: value-type-single
         - match: '(?=\s*{{identifier}})'
           pop: true

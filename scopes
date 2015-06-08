@@ -1,12 +1,98 @@
-closure.lambda
-closure.lambda.arguments
-closure.lambda.function
-closure.simple
-closure.simple.operator
-closure.inline.literal.lpc
-closure.inline.literal.parameter.lpc
-closure.inline.verbose.context.lpc
-closure.inline.verbose.lpc
+NOTES:
+- all scopes now end in .lpc, so this is left out of each line
+- scopes followed by a * are currently unused (i.e., proposed but not matched against)
+
+ARRAYS
+	meta.array
+	punctuation.definition.array.end
+	punctuation.definition.array.start
+
+CLOSURES
+	meta.closure.inline.literal
+	meta.closure.inline.literal.parameter
+	meta.closure.inline.verbose
+	meta.closure.inline.verbose.context
+	meta.closure.simple
+	meta.closure.simple.lfun
+	meta.closure.simple.operator
+	meta.closure.lambda
+	meta.closure.lambda.arguments
+	meta.closure.lambda.function
+	punctuation.definition.closure.inline.literal.end.lpc
+	punctuation.definition.closure.inline.literal.start.lpc
+	punctuation.definition.closure.simple.lpc
+
+CHAR CONSTANTS
+	constant.character
+	punctuation.definition.character.begin.lpc
+	punctuation.definition.character.end.lpc
+
+ENVIRONMENT (almost entirely speculative for now)
+	support.function.efun.lpc
+	support.function.sefun.lpc *
+	support.function.applied.lpc *
+	support.function.master.lpc *
+	support.constant.predefined.lpc *
+	support.constant.auto-include.lpc *
+	...
+
+DEFAULT
+	keyword.other.default.lpc
+	meta.default.lpc
+	meta.modifiers.default.lpc
+	storage.modifier.default.lpc
+	storage.type.default.lpc
+
+INHERIT
+	entity.other.inherit.lpc
+	keyword.other.inherit.lpc
+	keyword.other.inherit.virtual.lpc
+	meta.inherit.lpc
+	meta.modifiers.inherit.lpc
+	storage.modifier.inherit.lpc
+	storage.type.inherit.lpc
+
+MAPPINGS
+	meta.mapping.key
+	meta.mapping.row *
+	meta.mapping.value
+	punctuation.separator.key-value.mapping
+	punctuation.separator.row.mapping
+	punctuation.separator.value-value.mapping
+	punctuation.definition.mapping.end
+	punctuation.definition.mapping.start
+
+SPRINTF
+	constant.other.placeholder.field.lpc
+	constant.other.placeholder.field.precision.lpc
+	constant.other.placeholder.field.separator.lpc
+	constant.other.placeholder.field.width.lpc
+	constant.other.placeholder.lpc
+	constant.other.placeholder.modifier.lpc
+	constant.other.placeholder.pad.lpc
+	constant.other.placeholder.pad.string.lpc
+	constant.other.placeholder.type.lpc
+
+STRUCT
+	entity.name.struct.declaration.lpc
+	entity.name.struct.lpc
+	entity.name.struct.parent.lpc
+	meta.struct.literal.key
+	meta.struct.literal.row
+	meta.struct.literal.value
+	punctuation.definition.struct.literal.end
+	punctuation.definition.struct.literal.start
+	punctuation.separator.key-value.struct.literal
+
+SYMBOL
+	meta.symbol
+	variable.other.symbol # or meta.symbol.identifier? dunno
+	punctuation.definition.symbol.lpc
+
+UNIONS
+	punctuation.separator.union
+	punctuation.definition.union.array.end
+	punctuation.definition.union.array.start
 
 comment.block.lpc
 comment.line.banner.lpc
@@ -15,27 +101,14 @@ comment.other.preprocessor-disabled.lpc
 
 constant.character.escape.lpc
 constant.numeric.float.lpc
-constant.numeric.integer.binary.lpc
 constant.numeric.integer.lpc
+constant.numeric.integer.binary.lpc
 constant.numeric.integer.octal.lpc
-constant.other.placeholder.field.lpc
-constant.other.placeholder.field.precision.lpc
-constant.other.placeholder.field.separator.lpc
-constant.other.placeholder.field.width.lpc
-constant.other.placeholder.lpc
-constant.other.placeholder.modifier.lpc
-constant.other.placeholder.pad.lpc
-constant.other.placeholder.pad.string.lpc
-constant.other.placeholder.type.lpc
 
 entity.name.constant.preprocessor.lpc
 entity.name.function.declaration.lpc
 entity.name.function.definition.lpc
 entity.name.function.preprocessor.lpc
-entity.name.struct.declaration.lpc
-entity.name.struct.lpc
-entity.name.struct.parent.lpc
-entity.other.inherit.lpc
 
 invalid.deprecated.function.lpc
 invalid.deprecated.space-after-continuation.lpc
@@ -48,39 +121,23 @@ invalid.illegal.unexpected-end-of-line.lpc
 invalid.illegal.unknown-escape.lpc
 
 keyword.control.lpc
+
 keyword.operator.arithmetic.lpc
 keyword.operator.assignment.lpc
 keyword.operator.bitwise.lpc
 keyword.operator.comparison.lpc
 keyword.operator.dereference.lpc
 keyword.operator.increment-decrement.lpc
-keyword.operator.inherited.lpc
 keyword.operator.logical.lpc
+keyword.operator.super.lpc
 keyword.operator.ternary.lpc
-keyword.other.default-scope.lpc
-keyword.other.inherit.lpc
-keyword.other.inherit.statement.lpc #better scope?
-keyword.other.inherit.virtual.lpc
+
 keyword.other.line-continuation.lpc
 keyword.other.preprocessor.define.lpc
 keyword.other.preprocessor.include.lpc
 keyword.other.preprocessor.lpc
 keyword.other.preprocessor.pragma.lpc
-keyword.other.scope.default.lpc
-keyword.other.scope.default.type.lpc
-keyword.other.scope.default.visibility.lpc keyword.other.visibility.scope.default.lpc
-keyword.other.scope.inherit.lpc
-keyword.other.scope.inherit.type.lpc
-keyword.other.scope.inherit.visibility.lpc keyword.other.visibility.scope.inherit.lpc
 
-mapping.key-value-separator
-mapping.literal.key
-mapping.literal.row
-mapping.literal.value
-mapping.row-separator
-mapping.value-value-separator
-
-meta.array.literal.lpc
 meta.block.lpc
 meta.compound.lpc
 meta.function-call.lpc
@@ -100,28 +157,17 @@ meta.toc-list.banner.block.lpc
 meta.toc-list.banner.line.lpc
 meta.toc-list.pragma-mark.lpc
 
-punctuation.definition.array.literal.end.lpc
-punctuation.definition.array.literal.start.lpc
-punctuation.definition.closure.inline.literal.end.lpc
-punctuation.definition.closure.inline.literal.start.lpc
 punctuation.definition.comment.lpc
 punctuation.definition.ellipsis.lpc
-punctuation.definition.mapping.literal.end.lpc
-punctuation.definition.mapping.literal.start.lpc
 punctuation.definition.string.begin.lpc
 punctuation.definition.string.end.lpc
-punctuation.definition.struct.literal.end.lpc
-punctuation.definition.struct.literal.start.lpc
 punctuation.separator.continuation.lpc
 punctuation.separator.parameter.lpc
-punctuation.union.array.end.lpc
-punctuation.union.array.start.lpc
 
 storage.modifier.function.lpc
 storage.modifier.variable.lpc
 storage.type.array.lpc
 storage.type.lpc
-storage.type.union.lpc
 storage.type.union.lpc
 
 string.macro.stringify.lpc
@@ -129,20 +175,6 @@ string.other.pragma-mark.lpc
 string.quoted.double.include.lpc
 string.quoted.double.lpc
 string.quoted.other.lt-gt.include.lpc
-string.quoted.single.lpc
-
-struct-key-value-separator # i.e., the colon
-struct-literal-key
-struct-literal-row
-struct-literal-value
-
-support.function.efun.lpc
-
-symbol-entity
-symbol-identifier
-symbol-punctuation
-
-type_union_operator
 
 variable.global.lpc
 variable.macro.undef.lpc

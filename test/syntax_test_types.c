@@ -27,7 +27,7 @@ symbol * types_array_i;
 //simple literals
 float types_literal_a = 1.1333333;
 int types_literal_b = 113333;
-string types_literal_c = "super calloused"+ "fragile mystic";
+string types_literal_c = "super calloused" + "fragile mystic";
 symbol types_literal_d = 'types_literal_b;
 
 
@@ -49,6 +49,7 @@ closure types_literal_e3 = lambda( ({ 'x }), ({ #'environment, 'x }) );
 closure types_literal_e4 = function int (int val) : int x = 2 * types_literal_b { return val * x; };
 #endif
 mapping types_literal_f = ([1:2;3, "one":"two";"three"]);
+mapping types_literal_g = ([1, 2, 3, "one", "two", "three"]);
 
 struct StructOne types_literal_g1 = (<StructOne>
 	one_a: #'this_object,
@@ -186,7 +187,7 @@ void types()
 	//simple literals
 	float local_types_literal_a = 1.1333333;
 	int local_types_literal_b = 113333;
-	string local_types_literal_c = "super calloused"+ "fragile mystic";
+	string local_types_literal_c = "super calloused" + "fragile mystic";
 	symbol local_types_literal_d = 'local_types_literal_b;
 
 	//simple array literals
@@ -241,7 +242,7 @@ void types()
 	//some more advanced int/char literals
 	local_types_literal_b = 0x1000 + 0o000 + 0b000 + 'x' + ';' + 'a';
 
-	local_types_literal_c = "super calloused"+ "fragile mystic";
+	local_types_literal_c = "super calloused" + "fragile mystic";
 	local_types_literal_b;
 
 	//simple array literals
