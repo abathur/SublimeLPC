@@ -5,7 +5,8 @@ NOTES:
 ARRAYS
 	meta.array
 	punctuation.definition.array.end
-	punctuation.definition.array.start
+	punctuation.definition.array.begin
+	punctuation.separator.value.array *
 
 CLOSURES
 	meta.closure.inline.literal
@@ -19,7 +20,7 @@ CLOSURES
 	meta.closure.lambda.arguments
 	meta.closure.lambda.function
 	punctuation.definition.closure.inline.literal.end.lpc
-	punctuation.definition.closure.inline.literal.start.lpc
+	punctuation.definition.closure.inline.literal.begin.lpc
 	punctuation.definition.closure.simple.lpc
 
 CHAR CONSTANTS
@@ -59,8 +60,9 @@ MAPPINGS
 	punctuation.separator.key-value.mapping
 	punctuation.separator.row.mapping
 	punctuation.separator.value-value.mapping
+	punctuation.separator.index.mapping *
 	punctuation.definition.mapping.end
-	punctuation.definition.mapping.start
+	punctuation.definition.mapping.begin
 
 SPRINTF
 	constant.other.placeholder.field.lpc
@@ -81,7 +83,7 @@ STRUCT
 	meta.struct.literal.row
 	meta.struct.literal.value
 	punctuation.definition.struct.literal.end
-	punctuation.definition.struct.literal.start
+	punctuation.definition.struct.literal.begin
 	punctuation.separator.key-value.struct.literal
 
 SYMBOL
@@ -92,7 +94,7 @@ SYMBOL
 UNIONS
 	punctuation.separator.union
 	punctuation.definition.union.array.end
-	punctuation.definition.union.array.start
+	punctuation.definition.union.array.begin
 
 comment.block.lpc
 comment.line.banner.lpc
@@ -143,13 +145,14 @@ meta.compound.lpc
 meta.function-call.lpc
 meta.function-call.super.lpc
 meta.function.lpc
+meta.function.defintion.lpc *
 meta.parens.lpc
 meta.preprocessor.directive.lpc
 meta.preprocessor.directive.lpc invalid.illegal.preprocessor.lpc
 meta.preprocessor.directive.lpc keyword.other.preprocessor.lpc
 meta.preprocessor.directive.null-directive.lpc
 meta.preprocessor.directive.pragma-mark.lpc
-meta.preprocessor.include.lpc meta.preprocessor.lpc.include
+meta.preprocessor.include.lpc meta.preprocessor.lpc.include.lpc
 meta.preprocessor.macro.lpc
 meta.preprocessor.macro.parameters.lpc
 meta.preprocessor.undef.lpc

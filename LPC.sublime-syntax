@@ -23,7 +23,7 @@ contexts:
     - include: translation_unit
   array-literal:
     - match: '\({'
-      scope: punctuation.definition.array.start.lpc
+      scope: punctuation.definition.array.begin.lpc
       push:
         - meta_scope: meta.array.lpc
         - match: '}\)'
@@ -73,7 +73,7 @@ contexts:
   closure-inline-literal:
     - match: (\(:)
       captures:
-        1: punctuation.definition.closure.inline.literal.start.lpc
+        1: punctuation.definition.closure.inline.literal.begin.lpc
       push:
         - meta_scope: meta.closure.inline.literal.lpc
         - match: ':\)'
@@ -226,6 +226,7 @@ contexts:
         1: storage.modifier.function.lpc
         2: invalid.deprecated.function.lpc
   function-declaration:
+    - meta_content_scope: test
     - include: function-modifier
     - include: value-type # should probably be a warning/invalid type if absent, yeah?
     - match: |-
@@ -245,6 +246,7 @@ contexts:
         - include: parens
         - include: value-type
   function-definition:
+    - meta_scope: test
     - include: function-modifier
     - include: value-type
     - match: |-
@@ -317,8 +319,7 @@ contexts:
   lex-core:
     - include: comments
     - include: lex-continuation
-    - include: lex-number
-    - include: lex-string
+    - include: lex-literal
   lex-in-preprocessor:
     - include: lex-core
     - include: lex-keyword
@@ -331,7 +332,7 @@ contexts:
       captures:
         1: storage.modifier.variable.lpc
         2: invalid.deprecated.variable.lpc
-    - match: (\-|\+|\*|\/|%|&|\||\^|<<|>>)?=
+    - match: (\-|\+|\*|\/|%|&{1,2}|\|{1,2}|\^|<{2,3}|>{2,3})?=(?!=)
       scope: keyword.operator.assignment.lpc
     - match: (==|!=|<=|>=|<>|<|>)
       scope: keyword.operator.comparison.lpc
@@ -349,6 +350,12 @@ contexts:
       scope: keyword.operator.flatten.lpc
     - match: '(\.|->)(?=(?:\s|/\*.*?\*/)*+[A-Za-z_]\w*+)'
       scope: keyword.operator.dereference.lpc
+  lex-literal:
+    - include: lex-number
+    - include: lex-string
+    - include: array-literal
+    - include: mapping-literal
+    - include: struct-literal
   lex-number:
     - match: '\s*(\b(0[xX][0-9a-fA-F]*|0[0-7]*|[1-9][0-9]*)\b)'
       captures:
@@ -403,7 +410,7 @@ contexts:
         - include: string_escaped_char
   mapping-literal:
     - match: '\(\['
-      scope: punctuation.definition.mapping.start.lpc
+      scope: punctuation.definition.mapping.begin.lpc
       push:
         - meta_scope: meta.mapping.lpc
         - match: (?<=\(\[|,)\s*
@@ -481,7 +488,7 @@ contexts:
       captures:
         0: keyword.other.preprocessor.include.lpc
       push:
-        - meta_scope: meta.preprocessor.include.lpc meta.preprocessor.lpc.include
+        - meta_scope: meta.preprocessor.include.lpc meta.preprocessor.lpc.include.lpc
         - match: '(?:("[^"]*?)|(<[^>]*?))(\n)|(?<=^|[^\\])\s*(?=\n)$\n?'
           captures:
             1: string.quoted.double.include.lpc
@@ -738,7 +745,7 @@ contexts:
           pop: true
   struct-literal:
     - match: '\(\<'
-      scope: punctuation.definition.struct.literal.start.lpc
+      scope: punctuation.definition.struct.literal.begin.lpc
       push:
         - match: '{{identifier}}'
           scope: entity.name.struct.lpc
@@ -850,12 +857,12 @@ contexts:
         4: storage.type.array.lpc
   value-type-union:
     - match: <(?={{value_types}}\s*\|)
-      scope: punctuation.definition.union.array.start
+      scope: punctuation.definition.union.array.begin.lpc
       push:
         - meta_content_scope: storage.type.union.lpc
         - match: '(>)\s*(\*)?(\s*\|)?'
           captures:
-            1: punctuation.definition.union.array.end
+            1: punctuation.definition.union.array.end.lpc
             2: storage.type.array.lpc
             3: punctuation.separator.union.lpc
           pop: true
