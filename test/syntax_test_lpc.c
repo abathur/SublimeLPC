@@ -1,4 +1,4 @@
-// SYNTAX TEST "Packages/User/LPC/LPC.sublime-syntax"
+// SYNTAX TEST "Packages/SublimeLPC/LPC.sublime-syntax"
 // syntax highlighting test for LPC
 /* This test file (and others in this directory) should demonstrate all major features of LPC as well as some common syntactical edge cases for the purpose of testing the robustness of the syntax highlighter. This file should successfully compile (at least on 3.5.x)... */
 

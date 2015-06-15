@@ -1,4 +1,4 @@
-// SYNTAX TEST "Packages/User/LPC/LPC.sublime-syntax"
+// SYNTAX TEST "Packages/SublimeLPC/LPC.sublime-syntax"
 #if 0
 // <- meta.preprocessor.directive.lpc keyword.other.preprocessor.lpc
 //  ^ constant.numeric.integer.lpc

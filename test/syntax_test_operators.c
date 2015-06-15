@@ -1,4 +1,4 @@
-// SYNTAX TEST "Packages/User/LPC/LPC.sublime-syntax"
+// SYNTAX TEST "Packages/SublimeLPC/LPC.sublime-syntax"
 public int operators()
 {
     int operators_a = 10;

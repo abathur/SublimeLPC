@@ -1,4 +1,4 @@
-// SYNTAX TEST "Packages/User/LPC/LPC.sublime-syntax"
+// SYNTAX TEST "Packages/SublimeLPC/LPC.sublime-syntax"
 //demonstrate flow-control keywords and some related concepts
 
 void reset()

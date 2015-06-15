@@ -1,4 +1,4 @@
-// SYNTAX TEST "Packages/User/LPC/LPC.sublime-syntax"
+// SYNTAX TEST "Packages/SublimeLPC/LPC.sublime-syntax"
 /* Won't update directly; relies on structs only present when included in lpc.c */
 #define CRASH_WARNING 1 //see use below; don't change this value
 //SECTION 1: OBJECT-GLOBAL VARIABLES

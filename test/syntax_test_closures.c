@@ -1,4 +1,4 @@
-// SYNTAX TEST "Packages/User/LPC/LPC.sublime-syntax"
+// SYNTAX TEST "Packages/SublimeLPC/LPC.sublime-syntax"
 closure efuns()
 {
     //this isn't detected properly, but not sure if I should fix; it's valid LPC, but it may be fine it it shows up as an error, since there's no assignment to make use of the closure; the minimal use case (though treating this as an error implies a single variable reference alone on a line should effectively also be an error.)
