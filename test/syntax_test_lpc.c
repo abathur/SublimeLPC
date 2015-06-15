@@ -75,9 +75,10 @@ void reset(int arg)
 	operators();
 	indexing();
 	types();
-}
 
+	object obj;
 	obj = this_object();
 	obj = efun::this_object();
 	this_object();
 	efun::this_object();
+}

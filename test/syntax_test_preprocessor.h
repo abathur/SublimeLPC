@@ -74,6 +74,7 @@ Test out the preprocessor
     MICRO \
     )
 
+#if 0
 #define VERSION(MAJOR, MINOR, MICRO) ( \
 // <- meta.preprocessor.macro.lpc
 // ^  keyword.other.preprocessor.define.lpc
@@ -93,6 +94,7 @@ Test out the preprocessor
 //        ^ punctuation.separator.continuation.lpc keyword.other.line-continuation.lpc
     )
 // <- meta.preprocessor.macro.lpc
+#endif
 
 #define LDMUD_VERSION VERSION(__VERSION_MAJOR__, __VERSION_MINOR__, __VERSION_MICRO__)
 // <- meta.preprocessor.macro.lpc
