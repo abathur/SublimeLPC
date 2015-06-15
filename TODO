@@ -1,11 +1,5 @@
 OVERVIEW:
-The LPC.sublime-syntax file is currently a very early draft. I've put in a fair amount of work on matching/patterns, but I've been suffering from some serious decision fatigue when it comes to naming scopes (and to a lesser degree deciding how specific some scopes should be). Luckily, assistance in this area doesn't require much understanding of the syntax file format.
-
-Syntax scopes can be any string, really. They're traditionally dot-delimited, in theory from less to more specific. The primary challenge is that, for a scope to DO anything, you need a theme that makes use of some part of the scope string (probably the leftmost parts). So there's a bit of a tradeoff between giving things the right name, and giving them a name that will result in useful syntax highlighting. We can of course give things a "correct" name, and a name that is more likely to result in useful highlighting.
-
-http://www.apeth.com/nonblog/stories/textmatebundle.html has a list of commonly-themed scopes, but I haven't done my own survey of themes to see how accurate it is.
-
-A subset of this problem is that sometimes things don't really have a name. We'll just refer to this colon or that semicolon without naming it. What names would you give the comma, colon and semicolon used to delimit keys and values in a mapping literal, for example?
+The LPC.sublime-syntax file is currently a rough draft. It should be usable, though it could use a bit of refinement.
 
 NOTES:
 - I edit this file while using the PlainTasks sublime-text package, which isn't essential for reading this, but does make it easier on the eyes. I use the following user settings for PlainTasks
@@ -46,9 +40,10 @@ General:
     ✔ replace placeholder contexts with something vaguely descriptive if not reasonable @done (15-06-04 14:33)
     ✔ remove all incidental profanity :) @done (15-06-04 14:33)
     ☐ do a better job of documenting regex while you still remember what it's for...
-    ☐ review all scopes in LPC.sublime-syntax to make sure they end with .lpc
-    ☐ Ran out of steam writing tests in syntax_test_closures.c around line 150; would be nice to finish it, though.
+    ✔ review all scopes in LPC.sublime-syntax to make sure they end with .lpc @done (15-06-14 23:03)
+    ☐ Ran out of steam writing tests in syntax_test_closures.c and syntax_test_types.c; would be nice to finish them, though.
     ☐ I think I may need to invert a lot of the punctuation match scopes; they're often like punctuation.separator.mapping.context.lpc instead of punctuation.separator.context.mapping.lpc?
+    ☐ Do a pass over this document, implement everything trivial, move everything nontrivial to a github issue of its own, delete doc.
 
 Matching & language features:
     ✔ fix function declaration / global variable assignment confusion @done (15-05-31 21:40)

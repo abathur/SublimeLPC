@@ -1,5 +1,5 @@
 NOTES:
-- all scopes now end in .lpc, so this is left out of each line
+- all scopes now end in .lpc, so this is left out of each line here
 - scopes followed by a * are currently unused (i.e., proposed but not matched against)
 
 ARRAYS
@@ -19,39 +19,39 @@ CLOSURES
 	meta.closure.lambda
 	meta.closure.lambda.arguments
 	meta.closure.lambda.function
-	punctuation.definition.closure.inline.literal.end.lpc
-	punctuation.definition.closure.inline.literal.begin.lpc
-	punctuation.definition.closure.simple.lpc
+	punctuation.definition.closure.inline.literal.end
+	punctuation.definition.closure.inline.literal.begin
+	punctuation.definition.closure.simple
 
 CHAR CONSTANTS
 	constant.character
-	punctuation.definition.character.begin.lpc
-	punctuation.definition.character.end.lpc
+	punctuation.definition.character.begin
+	punctuation.definition.character.end
 
 ENVIRONMENT (almost entirely speculative for now)
-	support.function.efun.lpc
-	support.function.sefun.lpc *
-	support.function.applied.lpc *
-	support.function.master.lpc *
-	support.constant.predefined.lpc *
-	support.constant.auto-include.lpc *
+	support.function.efun
+	support.function.sefun *
+	support.function.applied *
+	support.function.master *
+	support.constant.predefined *
+	support.constant.auto-include *
 	...
 
 DEFAULT
-	keyword.other.default.lpc
-	meta.default.lpc
-	meta.modifiers.default.lpc
-	storage.modifier.default.lpc
-	storage.type.default.lpc
+	keyword.other.default
+	meta.default
+	meta.modifiers.default
+	storage.modifier.default
+	storage.type.default
 
 INHERIT
-	entity.other.inherit.lpc
-	keyword.other.inherit.lpc
-	keyword.other.inherit.virtual.lpc
-	meta.inherit.lpc
-	meta.modifiers.inherit.lpc
-	storage.modifier.inherit.lpc
-	storage.type.inherit.lpc
+	entity.other.inherit
+	keyword.other.inherit
+	keyword.other.inherit.virtual
+	meta.inherit
+	meta.modifiers.inherit
+	storage.modifier.inherit
+	storage.type.inherit
 
 MAPPINGS
 	meta.mapping.key
@@ -65,20 +65,20 @@ MAPPINGS
 	punctuation.definition.mapping.begin
 
 SPRINTF
-	constant.other.placeholder.field.lpc
-	constant.other.placeholder.field.precision.lpc
-	constant.other.placeholder.field.separator.lpc
-	constant.other.placeholder.field.width.lpc
-	constant.other.placeholder.lpc
-	constant.other.placeholder.modifier.lpc
-	constant.other.placeholder.pad.lpc
-	constant.other.placeholder.pad.string.lpc
-	constant.other.placeholder.type.lpc
+	constant.other.placeholder.field
+	constant.other.placeholder.field.precision
+	constant.other.placeholder.field.separator
+	constant.other.placeholder.field.width
+	constant.other.placeholder
+	constant.other.placeholder.modifier
+	constant.other.placeholder.pad
+	constant.other.placeholder.pad.string
+	constant.other.placeholder.type
 
 STRUCT
-	entity.name.struct.declaration.lpc
-	entity.name.struct.lpc
-	entity.name.struct.parent.lpc
+	entity.name.struct.declaration
+	entity.name.struct
+	entity.name.struct.parent
 	meta.struct.declaration
 	meta.struct.definition
 	meta.struct.literal.key
@@ -91,96 +91,96 @@ STRUCT
 SYMBOL
 	meta.symbol
 	variable.other.symbol # or meta.symbol.identifier? dunno
-	punctuation.definition.symbol.lpc
+	punctuation.definition.symbol
 
 UNIONS
 	punctuation.separator.union
 	punctuation.definition.union.array.end
 	punctuation.definition.union.array.begin
 
-comment.block.lpc
-comment.line.banner.lpc
-comment.line.double-slash.lpc
-comment.other.preprocessor-disabled.lpc
+comment.block
+comment.line.banner
+comment.line.double-slash
+comment.other.preprocessor-disabled
 
-constant.character.escape.lpc
-constant.numeric.float.lpc
-constant.numeric.integer.lpc
-constant.numeric.integer.binary.lpc
-constant.numeric.integer.octal.lpc
+constant.character.escape
+constant.numeric.float
+constant.numeric.integer
+constant.numeric.integer.binary
+constant.numeric.integer.octal
 
-entity.name.constant.preprocessor.lpc
-entity.name.function.declaration.lpc
-entity.name.function.definition.lpc
-entity.name.function.preprocessor.lpc
+entity.name.constant.preprocessor
+entity.name.function.declaration
+entity.name.function.definition
+entity.name.function.preprocessor
 
-invalid.deprecated.function.lpc
-invalid.deprecated.space-after-continuation.lpc
-invalid.deprecated.variable.lpc
-invalid.illegal.invalid-usage-of-preprocessor-directive.lpc
-invalid.illegal.stray-comment-end.lpc
-invalid.illegal.unexpected-character.lpc
-invalid.illegal.unexpected-closing-paren.lpc
-invalid.illegal.unexpected-end-of-line.lpc
-invalid.illegal.unknown-escape.lpc
+invalid.deprecated.function
+invalid.deprecated.space-after-continuation
+invalid.deprecated.variable
+invalid.illegal.invalid-usage-of-preprocessor-directive
+invalid.illegal.stray-comment-end
+invalid.illegal.unexpected-character
+invalid.illegal.unexpected-closing-paren
+invalid.illegal.unexpected-end-of-line
+invalid.illegal.unknown-escape
 
-keyword.control.lpc
+keyword.control
 
-keyword.operator.arithmetic.lpc
-keyword.operator.assignment.lpc
-keyword.operator.bitwise.lpc
-keyword.operator.comparison.lpc
-keyword.operator.dereference.lpc
-keyword.operator.increment-decrement.lpc
-keyword.operator.logical.lpc
-keyword.operator.super.lpc
-keyword.operator.ternary.lpc
+keyword.operator.arithmetic
+keyword.operator.assignment
+keyword.operator.bitwise
+keyword.operator.comparison
+keyword.operator.dereference
+keyword.operator.increment-decrement
+keyword.operator.logical
+keyword.operator.super
+keyword.operator.ternary
 
-keyword.other.line-continuation.lpc
-keyword.other.preprocessor.define.lpc
-keyword.other.preprocessor.include.lpc
-keyword.other.preprocessor.lpc
-keyword.other.preprocessor.pragma.lpc
+keyword.other.line-continuation
+keyword.other.preprocessor.define
+keyword.other.preprocessor.include
+keyword.other.preprocessor
+keyword.other.preprocessor.pragma
 
-meta.block.lpc
-meta.compound.lpc
-meta.function-call.lpc
-meta.function-call.super.lpc
-meta.function.lpc
-meta.function.defintion.lpc *
-meta.parens.lpc
-meta.preprocessor.directive.lpc
-meta.preprocessor.directive.lpc invalid.illegal.preprocessor.lpc
-meta.preprocessor.directive.lpc keyword.other.preprocessor.lpc
-meta.preprocessor.directive.null-directive.lpc
-meta.preprocessor.directive.pragma-mark.lpc
-meta.preprocessor.include.lpc meta.preprocessor.lpc.include.lpc
-meta.preprocessor.macro.lpc
-meta.preprocessor.macro.parameters.lpc
-meta.preprocessor.undef.lpc
-meta.toc-list.banner.block.lpc
-meta.toc-list.banner.line.lpc
-meta.toc-list.pragma-mark.lpc
+meta.block
+meta.compound
+meta.function-call
+meta.function-call.super
+meta.function
+meta.function.defintion *
+meta.parens
+meta.preprocessor.directive
+meta.preprocessor.directive invalid.illegal.preprocessor
+meta.preprocessor.directive keyword.other.preprocessor
+meta.preprocessor.directive.null-directive
+meta.preprocessor.directive.pragma-mark
+meta.preprocessor.include meta.preprocessor.include
+meta.preprocessor.macro
+meta.preprocessor.macro.parameters
+meta.preprocessor.undef
+meta.toc-list.banner.block
+meta.toc-list.banner.line
+meta.toc-list.pragma-mark
 
-punctuation.definition.comment.lpc
-punctuation.definition.ellipsis.lpc
-punctuation.definition.string.begin.lpc
-punctuation.definition.string.end.lpc
-punctuation.separator.continuation.lpc
-punctuation.separator.parameter.lpc
+punctuation.definition.comment
+punctuation.definition.ellipsis
+punctuation.definition.string.begin
+punctuation.definition.string.end
+punctuation.separator.continuation
+punctuation.separator.parameter
 
-storage.modifier.function.lpc
-storage.modifier.variable.lpc
-storage.type.array.lpc
-storage.type.lpc
-storage.type.union.lpc
+storage.modifier.function
+storage.modifier.variable
+storage.type.array
+storage.type
+storage.type.union
 
-string.macro.stringify.lpc
-string.other.pragma-mark.lpc
-string.quoted.double.include.lpc
-string.quoted.double.lpc
-string.quoted.other.lt-gt.include.lpc
+string.macro.stringify
+string.other.pragma-mark
+string.quoted.double.include
+string.quoted.double
+string.quoted.other.lt-gt.include
 
-variable.global.lpc
-variable.macro.undef.lpc
-variable.parameter.lpc
+variable.global
+variable.macro.undef
+variable.parameter
