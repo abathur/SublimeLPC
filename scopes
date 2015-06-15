@@ -79,6 +79,8 @@ STRUCT
 	entity.name.struct.declaration.lpc
 	entity.name.struct.lpc
 	entity.name.struct.parent.lpc
+	meta.struct.declaration
+	meta.struct.definition
 	meta.struct.literal.key
 	meta.struct.literal.row
 	meta.struct.literal.value

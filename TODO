@@ -46,6 +46,9 @@ General:
     ✔ replace placeholder contexts with something vaguely descriptive if not reasonable @done (15-06-04 14:33)
     ✔ remove all incidental profanity :) @done (15-06-04 14:33)
     ☐ do a better job of documenting regex while you still remember what it's for...
+    ☐ review all scopes in LPC.sublime-syntax to make sure they end with .lpc
+    ☐ Ran out of steam writing tests in syntax_test_closures.c around line 150; would be nice to finish it, though.
+    ☐ I think I may need to invert a lot of the punctuation match scopes; they're often like punctuation.separator.mapping.context.lpc instead of punctuation.separator.context.mapping.lpc?
 
 Matching & language features:
     ✔ fix function declaration / global variable assignment confusion @done (15-05-31 21:40)
@@ -86,7 +89,8 @@ Matching & language features:
             ✔ numbers (int, float, 0x, 0b, 0o) @done (15-05-31 23:17)
             ✔ string (double quoted) @done (15-05-31 23:21)
                 ✔ LPC sprintf format @done (15-05-31 23:22)
-                    ☐ This looks largely fine at a visual layer from this distance, but I suspect this is one of the areas where everyone could benefit from some time investment into identifying invalid combinations, missing parts, etc.
+                    ☐ This looks largely fine at a visual perspective from this distance, but I suspect this is one of the areas where everyone could benefit from some time investment into identifying invalid combinations, missing parts, etc.
+                    ☐ currently doing nothing with some rules about prepending a 0 to a few numeric values
             ✔ structs @done (15-05-31 23:17)
             ✔ symbols @done (15-05-31 23:25)
         ☐ type unions

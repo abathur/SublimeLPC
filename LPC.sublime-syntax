@@ -14,13 +14,15 @@ scope: source.lpc
 variables:
   bulk_global_scoping: ((private|protected|public|static)\s*(functions|variables)\s*)
   identifier: \b([A-Za-z_$][A-Za-z_$0-9]*+)\b
-  value_types: \s*\b(closure|float|int|mapping|mixed|object|string|struct\s+({{identifier}})|symbol|void)\b\s*(\*)?
+  value_types: \s*\b(closure|float|int|mapping|mixed|object|string|struct\s+({{identifier}})|symbol|void)\b\s*(\*{1,2})?
 contexts:
   main:
     - include: inherit
     - include: default_visibility
+    - include: struct
     - include: function
-    - include: translation_unit
+    - include: statement
+    - include: block
   array-literal:
     - match: '\({'
       scope: punctuation.definition.array.begin.lpc
@@ -92,7 +94,7 @@ contexts:
         - include: value-type
         - include: parens
         - include: lex
-        - match: '\s*:\s*(?=.*\{)'
+        - match: '\s*:\s*'
           push:
             - meta_scope: meta.closure.inline.verbose.context.lpc
             - include: lex
@@ -125,25 +127,27 @@ contexts:
       scope: support.function.efun.lpc
       push:
         - include: comments
-        - meta_content_scope: meta.closure.lambda
+        - meta_content_scope: meta.closure.lambda.lpc
         - match: \(\s*
           push:
           - include: comments
           - match: 0\s*
             scope: meta.closure.lambda.arguments.lpc
             pop: true
-          - match: '\(\{\s*' # start arguments
+          - match: '\(\{' # start arguments
             push:
               - meta_content_scope: meta.closure.lambda.arguments.lpc
+              - match: \s*
               - include: closure-lambda-arguments
           - match: \s*\}\)
             pop: true
         - match: '\s*,\s*'
           push:
             - include: comments
-            - match: '\(\{\s*' # start function
+            - match: '\(\{' # start function
               push:
                 - meta_content_scope: meta.closure.lambda.function.lpc
+                - match: \s*
                 - match: \s*\}\)
                   pop: true
                 - include: closure-lambda-function
@@ -156,7 +160,7 @@ contexts:
       scope: punctuation.definition.closure.simple.lpc
       push:
         - meta_scope: meta.closure.simple.lpc
-        - match: '(?<=#'')[\[(,=&|?\-+</>\*][<.{\[<|&!>\]=\-+]*'
+        - match: '(?<=#'')[\[(,=&|?\-+</>\*][,<.{\[<|&!>\]=\-+]*'
           scope: meta.closure.simple.operator.lpc
           pop: true
         - match: ({{identifier}})?(::)
@@ -416,7 +420,7 @@ contexts:
         - match: (?<=\(\[|,)\s*
           push:
             - meta_scope: meta.mapping.key.lpc
-            - match: (?=:|,)
+            - match: (?=:|,|]\))
               pop: true
             - include: statement
         - match: (?=]\))
@@ -488,7 +492,7 @@ contexts:
       captures:
         0: keyword.other.preprocessor.include.lpc
       push:
-        - meta_scope: meta.preprocessor.include.lpc meta.preprocessor.lpc.include.lpc
+        - meta_scope: meta.preprocessor.lpc meta.preprocessor.include.lpc
         - match: '(?:("[^"]*?)|(<[^>]*?))(\n)|(?<=^|[^\\])\s*(?=\n)$\n?'
           captures:
             1: string.quoted.double.include.lpc
@@ -505,7 +509,7 @@ contexts:
         - meta_scope: string.quoted.double.include.lpc
         - match: '"|(?<=^|[^\\])(?=\s*\n)'
           captures:
-            0: punctuation.definition.string.end.lpc
+            0: punctuation.definition.string.begin.lpc
           pop: true
     - match: <(?=.*?>)
       captures:
@@ -726,10 +730,19 @@ contexts:
       push:
         - match: |-
             (?x)
+
               (                           # 1
                 ('(.+)')                   | # pad str, 2-3
                 ([#\- +=|$@]*)             | # flags, 4
-                ((-?\d+|\*)?([:.])?(-?\d+|\*))| # 5-7
+                (                            # 5
+
+                  # n.n width.precision
+                  ((-?\d+|\*)([.])(-?\d+|\*))?  #6, 7-9
+                  # :n, width AND precision
+                  (([:])(-?\d+|\*))?            #10, 11-12
+                  # just n, always width
+                  ((-?\d+|\*))?                 #13, 14
+                )
               )
 
           captures:
@@ -737,12 +750,63 @@ contexts:
             3: constant.other.placeholder.pad.string.lpc
             4: constant.other.placeholder.modifier.lpc
             5: constant.other.placeholder.field.lpc
-            6: constant.other.placeholder.field.width.lpc
-            7: constant.other.placeholder.field.separator.lpc
-            8: constant.other.placeholder.field.precision.lpc
+            7: constant.other.placeholder.field.width.lpc
+            8: constant.other.placeholder.field.separator.lpc
+            9: constant.other.placeholder.field.precision.lpc
+            11: constant.other.placeholder.field.separator.lpc
+            12: constant.other.placeholder.field.width.lpc constant.other.placeholder.field.precision.lpc
+            14: constant.other.placeholder.field.width.lpc
         - match: '[sdfOQioxXeEgGc]'
           scope: constant.other.placeholder.type.lpc
           pop: true
+  struct:
+    - include: struct-declaration
+    - include: struct-definition
+  struct-declaration:
+    - match: |-
+        (?x)
+          ^(struct\b)
+          \s*
+          {{identifier}}
+          \s*;
+
+      captures:
+        0: meta.struct.declaration.lpc
+        1: storage.type.struct.lpc
+        2: entity.name.struct.declaration.lpc
+  struct-definition:
+    - match: |-
+        (?x)
+          ^(struct\b)
+          \s*
+          {{identifier}}
+          (?=\s*({|$))
+
+      # should've already caught declarations, so just assume this is a def
+      captures:
+        0: meta.struct.definition.lpc
+        1: storage.type.struct.lpc
+        2: entity.name.struct.definition.lpc
+        3: dingleberkus
+      push:
+        - meta_content_scope: meta.struct.definition.lpc
+        - match: |-
+            (?x)
+              (?: (?!\s*(?:[A-Za-z_({]|/[/*]|$))
+                | (?= \s*\b(?: [A-Za-z_]\w*+ ) (?= \s* [\[;] ) )
+              )
+
+          pop: true # abandon ship
+        - match: |-
+            (?x)
+              (\s*\(\s*([A-Za-z_]\w*+)\s*\))?
+
+          captures:
+            1: meta.struct.definition.parent.lpc
+            2: entity.name.struct.parent.lpc
+        - include: lex
+        - include: block
+        - include: parens
   struct-literal:
     - match: '\(\<'
       scope: punctuation.definition.struct.literal.begin.lpc
@@ -760,6 +824,7 @@ contexts:
     - match: (?<=.)
       set:
         - meta_content_scope: meta.struct.literal.key.lpc
+        - include: comments
         - include: struct-literal-key
     - match: '(?=\s*[)])'
       pop: true
@@ -774,8 +839,10 @@ contexts:
       pop: true
   struct-literal-value:
     - match: ',\s*'
+      scope: fluffernuts
       set:
         - meta_content_scope: meta.struct.literal.row.lpc
+        - include: comments
         - include: struct-literal-row
     - include: statement
     - match: '(?=\s*[)])'
@@ -786,66 +853,12 @@ contexts:
     - match: \s*\b(abs|acos|add_action|add_verb|add_xverb|all_environment|all_inventory|allocate|allocate_mapping|and_bits|apply|asin|assoc|atan|atan2|attach_erq_demon|baseof|binary_message|bind_lambda|blueprint|break_point|call_direct|call_direct_resolved|call_other|call_out|call_out_info|call_resolved|caller_stack|caller_stack_depth|capitalize|cat|catch|ceil|clear_bit|clone_object|clonep|clones|closurep|command|command_stack|command_stack_depth|configure_driver|configure_interactive|convert_charset|copy|copy_bits|copy_file|copy_mapping|cos|count_bits|creator|crypt|ctime|db_affected_rows|db_close|db_coldefs|db_connect|db_conv_string|db_error|db_exec|db_fetch|db_handles|db_insert_id|debug_info|debug_message|deep_copy|deep_inventory|destruct|disable_commands|ed|efun308|enable_commands|enable_telnet|end_mccp_compress|environment|exec|execute_command|exp|expand_define|explode|export_uid|extern_call|extract|file_name|file_size|filter|filter_array|filter_indices|filter_mapping|filter_objects|find_call_out|find_input_to|find_object|first_inventory|floatp|floor|funcall|function_exists|functionlist|garbage_collection|get_combine_charset|get_connection_charset|get_dir|get_error_file|get_eval_cost|get_extra_wizinfo|get_max_commands|get_type_info|geteuid|getuid|gmtime|hash|heart_beat_info|hmac|idna_stringprep|idna_to_ascii|idna_to_unicode|implode|include_list|inherit_list|input_to|input_to_info|insert_alist|interactive|intersect_alist|intp|invert_bits|json_parse|json_serialize|last_bit|last_instructions|limited|living|load_name|load_object|localtime|log|lower_case|m_add|m_allocate|m_contains|m_delete|m_entry|m_indices|m_reallocate|m_sizeof|m_values|make_shared_string|map|map_array|map_indices|map_mapping|map_objects|mapping_contains|mappingp|master|match_command|max|md5|md5_crypt|member|member_array|min|mkdir|mkmapping|mktime|move_object|negate|net_connect|next_bit|next_inventory|notify_fail|object_info|object_name|object_time|objectp|or_bits|order_alist|parse_command|pg_close|pg_connect|pg_conv_string|pg_pending|pg_query|pointerp|pow|present|present_clone|previous_object|printf|process_string|program_name|program_time|query_actions|query_command|query_editing|query_idle|query_imp_port|query_input_pending|query_ip_name|query_ip_number|query_limits|query_load_average|query_mccp|query_mccp_stats|query_mud_port|query_notify_fail|query_once_interactive|query_shadowing|query_snoop|query_udp_port|query_verb|quote|raise_error|random|read_bytes|read_file|referencep|regexp|regexp_package|regexplode|regmatch|regreplace|remove_action|remove_call_out|remove_input_to|remove_interactive|rename|rename_object|replace_program|restore_object|restore_value|reverse|rm|rmdir|rmember|rusage|save_object|save_value|say|send_erq|send_imp|send_udp|set_auto_include_string|set_bit|set_buffer_size|set_combine_charset|set_connection_charset|set_driver_hook|set_environment|set_extra_wizinfo|set_extra_wizinfo_size|set_heart_beat|set_is_wizard|set_light|set_limits|set_max_commands|set_modify_command|set_next_reset|set_prompt|set_this_object|set_this_player|seteuid|sgn|sha1|shadow|shutdown|sin|sizeof|sl_close|sl_exec|sl_insert_id|sl_open|slice_array|snoop|sort_array|sprintf|sqrt|sscanf|start_mccp_compress|strftime|stringp|strlen|strrstr|strstr|struct_info|structp|swap|symbol_function|symbol_variable|symbolp|tail|tan|tell_object|tell_room|terminal_colour|test_bit|this_interactive|this_object|this_player|throw|time|tls_available|tls_check_certificate|tls_deinit_connection|tls_error|tls_init_connection|tls_query_connection_info|tls_query_connection_state|tls_refresh_certs|to_array|to_float|to_int|to_object|to_string|to_struct|trace|traceprefix|transfer|transpose_array|trim|typeof|unique_array|unmkmapping|unquote|unshadow|upper_case|users|utime|variable_exists|variable_list|walk_mapping|widthof|wizlist_info|write|write_bytes|write_file|xml_generate|xml_parse|xor_bits)\b
       captures:
         1: support.function.efun.lpc
-  translation_unit:
-    - include: struct
-    - include: statement
-    - include: block
-  struct:
-    - include: struct-declaration
-    - include: struct-definition
-  struct-declaration:
-    - match: |-
-        (?x)
-          (?<= \A struct | \W struct ) \b
-          (?= (?:\s*+)
-              ([A-Za-z_]\w*+)
-              (?:\s*+);
-          )
-
-      push:
-        - meta_scope: meta.compound.lpc
-        - match: (?<=;) # terminate the declaration when we hit the semicolon
-          pop: true
-        - include: lex
-        - match: '\s*{{identifier}}'
-          captures:
-            1: entity.name.struct.declaration.lpc
-  struct-definition:
-    - match: |-
-        (?x)
-                (?<= \A struct | \W struct ) \b
-
-                # Negation of zero-length parts of the end pattern
-                # to prevent entering the rule if it's gonna exit immediately.
-                # (workaround ST2 bugs, see issue #10)
-                (?=\s*(?:[A-Za-z_({]|/[/*]|$))
-                (?! \s*\b(?: [A-Za-z_]\w*+ ) (?= \s* [\[;] ) )
-      push:
-        - meta_scope: meta.compound.lpc
-        - match: |-
-            (?x)
-                    (?: (?!\s*(?:[A-Za-z_({]|/[/*]|$))
-                      | (?= \s*\b(?: [A-Za-z_]\w*+ ) (?= \s* [\[;] ) )
-                    )
-
-          pop: true # abandon ship
-        - match: |-
-            (?x)
-              {{identifier}}
-              (\s*\(\s*([A-Za-z_]\w*+)\s*\))?
-
-          captures:
-            1: entity.name.struct.lpc
-            3: entity.name.struct.parent.lpc
-        - include: lex
-        - include: block
-        - include: parens
   symbol:
     - match: "(')({{identifier}})"
       captures:
         0: meta.symbol.lpc
         1: punctuation.definition.symbol.lpc
-        2: variable.other.symbol
+        2: variable.other.symbol.lpc
   value-type:
     - include: value-type-union
     - include: value-type-single
@@ -860,7 +873,7 @@ contexts:
       scope: punctuation.definition.union.array.begin.lpc
       push:
         - meta_content_scope: storage.type.union.lpc
-        - match: '(>)\s*(\*)?(\s*\|)?'
+        - match: '(>)\s*(\*{1,2})?(\s*\|)?'
           captures:
             1: punctuation.definition.union.array.end.lpc
             2: storage.type.array.lpc
@@ -871,7 +884,7 @@ contexts:
       push:
         - meta_content_scope: storage.type.union.lpc
         - match: '\|'
-          scope: punctuation.separator.union.lpc
+          scope: punctuation.separator.union2.lpc
         - include: value-type-single
         - match: '(?=\s*{{identifier}})'
           pop: true
