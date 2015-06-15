@@ -67,14 +67,14 @@ object * types_literal_array_e = ({this_object(), this_object()});
 
 //complex array literals
 #if LDMUD_VERSION >= VERSION(3, 5, 0)
-float ** types_literal_array_a = ({({1.113, 3.111})});
+float ** types_literal_array_a2 = ({({1.113, 3.111})});
 //<-storage.type.lpc
 //     ^ storage.type.array.lpc
-int ** types_literal_array_b = ({({1113, 3111})});
+int ** types_literal_array_b2 = ({({1113, 3111})});
 //                                      ^ source.lpc meta.array.lpc meta.array.lpc
-string ** types_literal_array_c = ({({"one", "two", "three"})});
-mixed ** types_literal_array_d = ({({"one", 1, 1.0})});
-object ** types_literal_array_e = ({({this_object(), this_object()})});
+string ** types_literal_array_c2 = ({({"one", "two", "three"})});
+mixed ** types_literal_array_d2 = ({({"one", 1, 1.0})});
+object ** types_literal_array_e2 = ({({this_object(), this_object()})});
 #endif
 
 
