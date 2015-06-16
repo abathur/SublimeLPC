@@ -424,14 +424,15 @@ contexts:
       scope: punctuation.definition.mapping.begin.lpc
       push:
         - meta_scope: meta.mapping.lpc
-        - match: (?<=\(\[|,)\s*
+        - match: ']\)'
+          scope: punctuation.definition.mapping.end.lpc
+          pop: true
+        - match: (?<=\(\[|,)
           push:
             - meta_scope: meta.mapping.key.lpc
             - match: (?=:|,|]\))
               pop: true
             - include: statement
-        - match: (?=]\))
-          pop: true
         - match: ':'
           scope: punctuation.separator.mapping.key-value.lpc
           push:
@@ -444,8 +445,6 @@ contexts:
         - match: ','
           scope: punctuation.separator.mapping.row.lpc
         - include: statement
-    - match: ']\)'
-      scope: punctuation.definition.mapping.end.lpc
   parens:
     - match: (?=\()
       push:
