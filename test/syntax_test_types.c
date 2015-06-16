@@ -168,6 +168,9 @@ object func_types_f();
 string func_types_g();
 struct StructBlue func_types_h();
 symbol func_types_i();
+            //multiline
+static int
+func_types_j();
 
         //array
 closure * func_array_types_a();
@@ -222,6 +225,12 @@ mixed * func_array_types_e()
     return ({ 1, 2, 3, ({4, 5, 6}), 7, 8, 9});
 }
 #endif
+            //multiline
+static int
+func_types_j()
+{
+    return 1;
+}
         //complex
 struct StructBlue post_structuralism(int one, struct StructOne two, string three)
 //<- storage.type.lpc
