@@ -110,6 +110,8 @@ mapping types_literal_g = ([1, 2, 3, "one", "two", "three"]);
 //                              ^ punctuation.separator.mapping.row.lpc
 //                                ^ meta.mapping.key.lpc constant.numeric.integer.lpc
 //                                 ^ punctuation.separator.mapping.row.lpc
+mapping types_literal_h1 = ([]);
+//                             ^ -meta.mapping.lpc
 
 struct StructOne types_literal_g1 = (<StructOne> //valid
 //<- source.lpc -meta.mapping.lpc
