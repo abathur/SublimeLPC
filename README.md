@@ -15,6 +15,7 @@ If you'd like to help develop SublimeLPC directly, you can:
 2. fork this repo
 3. `git clone` your fork into your ST3/Packages/ directory
 4. create a new branch, improve SublimeLPC, and submit a pull request
+5. iterate if the Travis-CI build doesn't succeed
 
 Any matching/scope changes should be accompanied by updates to the test cases (either to just keep scopes in sync, or add tests that will pass when the bug or edge case is fixed.)
 
